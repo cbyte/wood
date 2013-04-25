@@ -62,7 +62,7 @@ var Edit = new function() {
 			}
 		} else
 		//move cursor
-		vec3.scale(dir,dir,0.5);
+		//vec3.scale(dir,dir,0.5);
 		vec3.add(this.cursor.pos,this.cursor.pos,dir);
 		
 		//switch cursor model

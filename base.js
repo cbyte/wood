@@ -16,10 +16,6 @@ function PlaySound(s) {
 	audio.play();
 }
 
-function WorldToTile(x) {
-	return Math.floor(x+0.5);
-}
-
 var Time = new function() {
 	this.time = function() {
 		return (new Date()).getTime();
@@ -92,45 +88,6 @@ var Resource = new function() {
 			this.resources[f] = new Model(f);
 		}
 		return this.resources[f];
-	}
-};
-
-var Tilemap = new function() {
-	this.data = 0;
-	this.tile = new Array();
-	this.width = 0;
-	this.height = 0;
-	this.tilewidth = 1;
-	this.tileheight = 1;
-	
-	this.addTile = function(spr) {
-		this.tile[this.tile.length] = spr;
-	}
-	
-	this.load = function(arr,x,y) {
-		this.data = arr;
-		this.width = x;
-		this.height = y;
-	}
-	
-	this.getRenderData = function() {
-		if(!this.data) {
-			alert("no data"); return;
-		}
-		
-		var output = new Array();
-		var countobjects = 0;
-		for(var i=0;i<this.width*this.height;i++) {
-			//output[countobjects] = new Object(this.tile[this.data[countobjects]], (i%this.width)*this.tilewidth,
-			//										-Math.floor(i/this.width)*this.tileheight);
-			
-			output[countobjects] = new Object([	(i%this.width)*this.tilewidth,
-												-Math.floor(i/this.width)*this.tileheight
-												,0],[1,1,1],[0,0,0],0);
-			countobjects++;
-		}
-		
-		return output;
 	}
 };
 

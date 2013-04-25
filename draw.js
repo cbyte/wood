@@ -48,21 +48,6 @@ var Camera = new function() {
 	}
 };
 
-/*
-function Sprite(tex,w,h,solid,atlasinfo) {
-	this.hidden = 0;
-	this.width = w;
-	this.height = h;
-	this.texture = new Texture(tex);
-	this.texturename = tex;
-	this.solid = solid;
-	if(atlasinfo)
-		this.atlas = atlasinfo;
-	else 
-		this.atlas = 0;
-}
-*/
-
 function Atlas(rows,cols,def,animation) {
 	this.rows = rows;
 	this.cols = cols;
