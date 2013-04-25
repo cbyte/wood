@@ -3,7 +3,8 @@ var Object = function(pos,scale,dir,model) {
 	this.pos = pos;
 	this.scale = scale;
 	this.rotate = dir;
-	//this.spcoll = new Sphere([this.pos[0],this.pos[1],0],this.sprite.width*0.5);
+	
+	this.coll = new AABB(scale);
 }
 
 Object.prototype.update = function() {}
@@ -132,6 +133,10 @@ var Tilemap = new function() {
 		return output;
 	}
 };
+
+function max(a,b) {
+	return a>b?a:b;
+}
 
 function Init() {
 	Renderer.initGL();

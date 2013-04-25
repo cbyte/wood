@@ -62,6 +62,7 @@ var Edit = new function() {
 			}
 		} else
 		//move cursor
+		vec3.scale(dir,dir,0.5);
 		vec3.add(this.cursor.pos,this.cursor.pos,dir);
 		
 		//switch cursor model
@@ -75,7 +76,6 @@ var Edit = new function() {
 			this.cursor.model = this.models[this.cursormodel];
 			this.cursor.model.meshes[0].atlas.play(0);
 		}
-		
 		
 		//add level object if possible
 		if(Input.space) {
