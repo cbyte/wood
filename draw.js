@@ -117,7 +117,6 @@ function Texture(s) {
 	}
 	
 	image.onerror = function() { alert("failed to load image.");}
-	
 	image.src = s;
 }
 

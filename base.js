@@ -1,4 +1,4 @@
-var Object = function(pos,scale,dir,model) {
+function Object(pos,scale,dir,model) {
 	this.model = model;
 	this.pos = pos;
 	this.scale = scale;

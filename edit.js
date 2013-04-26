@@ -15,11 +15,12 @@ var Edit = new function() {
 		this.addModel("asset/box.json");
 		this.addModel("mesh.json");
 		this.cursor = new Object([0,0,0],[1,1,1],[0,0,0],this.models[0]);
-		//this.cursor.model.meshes[0].atlas = new Atlas(2,2,1,new Array([0],[1,500,0,1,2,3]));
 		
 		Camera.target = this.cursor;
 		Camera.dist = [0,0,5];
 		Camera.follow = 1;
+		
+		
 	}
 	
 	this.update = function(ts) {
@@ -74,7 +75,6 @@ var Edit = new function() {
 			
 			// switch to active model
 			this.cursor.model = this.models[this.cursormodel];
-			this.cursor.model.meshes[0].atlas.play(0);
 		}
 		
 		//add level object if possible
