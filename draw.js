@@ -48,14 +48,25 @@ var Camera = new function() {
 	}
 };
 
-function Atlas(rows,cols,def,animation) {
+function Atlas(rows,cols,animation) {
 	this.rows = rows;
 	this.cols = cols;
-	this.actualanim = def; //selected animation
+	this.actualanim = 0; //selected animation
 	this.actualanimstep = 0; // animation index
 	this.actual = 0; // finally selected texture 
 	this.animation = animation;
 	this.laststep = new Date();
+	this.dir = 1.0;
+	
+	this.clone = function(o) {
+		this.rows = o.rows;
+		this.cols = o.cols;
+		this.actualanim = o.actualanim;
+		this.actualanimstep = o.actualanimstep;
+		this.actual = o.actual;
+		this.animation = o.animation;
+		this.dir = o.dir;
+	}
 	
 	this.play = function(id) {
 		this.actualanim = id;
@@ -73,7 +84,7 @@ function Atlas(rows,cols,def,animation) {
 		
 		if(new Date(now-this.laststep).getMilliseconds() > this.animation[this.actualanim][1]) {
 			if(this.actualanimstep+1 < this.animation[this.actualanim].length-2)
-				this.actualanimstep++
+				this.actualanimstep++;
 			else
 				this.actualanimstep = 0;
 			
@@ -88,7 +99,7 @@ function Atlas(rows,cols,def,animation) {
 	}
 	
 	this.getV = function() {
-		return -Math.floor(this.actual/this.cols);
+		return -Math.ceil(this.actual/this.cols+1/this.cols);
 	}
 	
 	this.getSizeU = function() {
@@ -128,6 +139,7 @@ var Renderer = new function() {
 	this.norloc = 0;
 	this.texloc = 0;
 	this.atlasloc = 0;
+	this.dirloc = 0;
 	this.objects = new Array();
 	
 	this.initGL = function() {
@@ -176,6 +188,7 @@ var Renderer = new function() {
 		this.norloc = gl.getAttribLocation(this.program,"normal");
 		this.texloc = gl.getAttribLocation(this.program,"texcoord");
 		this.atlasloc = gl.getUniformLocation(this.program,"atlas");
+		this.dirloc = gl.getUniformLocation(this.program,"dir");
 		
 		// Enable Depth Test
 		gl.enable(gl.DEPTH_TEST);
@@ -188,7 +201,7 @@ var Renderer = new function() {
 		
 		gl.useProgram(this.program);
 		
-		gl.clearColor(0.85, 0.85, 0.89, 1);
+		gl.clearColor(1.0, 1.0, 1.0, 1);
 		gl.clearDepth(1.0);
 		gl.clear(gl.DEPTH_BUFFER_BIT|gl.COLOR_BUFFER_BIT);
 		
@@ -229,8 +242,7 @@ var Renderer = new function() {
 			
 			gl.uniform2fv(gl.getUniformLocation(this.program,"window"),[800.0,400.0]);
 			
-			
-			DrawModel(this.objects[i].model);
+			DrawModel(this.objects[i].model,this.objects[i].atlas);
 		}
 		
 		//default object

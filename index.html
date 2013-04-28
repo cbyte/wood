@@ -8,7 +8,9 @@
 	<script type="text/javascript" src="mesh.js"></script>
 	<script type="text/javascript" src="draw.js"></script>
 	<script type="text/javascript" src="coll.js"></script>
+	<script type="text/javascript" src="game.js"></script>
 	<script type="text/javascript" src="edit.js"></script>
+	<script type="text/javascript" src="lvl.js"></script>
 	<link rel="stylesheet" href="style.css"/>
   </head>
   <body>
@@ -29,10 +31,12 @@
 	
 	varying vec4 vNormalWorld;
 	
+	uniform float dir;
+	
 	void main()
 	{
-		texCoord0.x = texcoord.x*atlas.z + (atlas.x+1.0)*atlas.z;
-		texCoord0.y = texcoord.y*atlas.w + atlas.y*atlas.w;
+		texCoord0.x = dir*texcoord.x*atlas.z + dir*atlas.x*atlas.z;
+		texCoord0.y = texcoord.y*atlas.a+atlas.y*atlas.a;
 		
 		vNormalWorld = matModelView*vec4(normal,0.0);
 		vNormal = matModelViewTranspose*vec4(normal,0.0);
@@ -55,13 +59,16 @@
 	
 	void main()
 	{
-		vec4 dirLight = vec4(10.0,10.0,10.0,0.0);
-		float att = max(0.3,dot(normalize(vNormalWorld),normalize(dirLight)));
+		vec4 dirLight = vec4(0.0,0.0,0.5,0.0);
+		float att = max(0.9,dot(normalize(vNormalWorld),normalize(dirLight)));
 		gl_FragColor = vec4( att*(texture2D(img,texCoord0)).xyz , texture2D(img,texCoord0).a);
+		if(texture2D(img,texCoord0).a<0.5) discard;
 	}
   </div>
   <noscript>NO JAVASCRIPT</noscript>
+  <div id="COORD"></div>
   <div id="WebGLCanvasCreationScript"></div>
+  <div id="edit"></div>
 	<script type="text/javascript" style="width:100%;height:100%">
 	 WebGLHelper.CreateGLCanvasInline('webgl', Init, NoWebGL); 
   </script>

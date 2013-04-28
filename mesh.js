@@ -63,25 +63,30 @@ var Model = function(filename) {
 //GLOBAL last bound texture
 var lasttex = 0;
 
-function DrawModel(m) {
+function DrawModel(m,atlas) {
+	
 	gl.enableVertexAttribArray(Renderer.posloc);
 	gl.enableVertexAttribArray(Renderer.norloc);
 	gl.enableVertexAttribArray(Renderer.texloc);
 	
 	for(var i=0;i<m.meshes.length;i++) {
-		if(m.meshes[i].matoffset != lasttex) {
+		if(m.materials[m.meshes[i].matoffset].texfile != lasttex || lasttex==0) {
 			m.materials[m.meshes[i].matoffset].tex.bind();
-			lasttex = m.meshes[i].matoffset;
+			lasttex = m.materials[m.meshes[i].matoffset].texfile;
 			//console.log("bind texture()");
 		}
 		
-		if(m.meshes[i].atlas!=0) {
-				m.meshes[i].atlas.animate();
-				gl.uniform4f(Renderer.atlasloc, m.meshes[i].atlas.getU(), m.meshes[i].atlas.getV(), 
-																			m.meshes[i].atlas.getSizeU(),m.meshes[i].atlas.getSizeV());
+		
+		if(atlas) {
+				gl.uniform1f(Renderer.dirloc,atlas.dir);
+				atlas.animate();
+				gl.uniform4f(Renderer.atlasloc, atlas.getU(), atlas.getV(), 
+							atlas.getSizeU(),atlas.getSizeV());
 			}
-			else
+			else {
 				gl.uniform4f(Renderer.atlasloc, 0.0, 0.0, 1.0, 1.0);
+				gl.uniform1f(Renderer.dirloc,1.0);
+			}
 		
 		gl.bindBuffer(gl.ARRAY_BUFFER, m.meshes[i].vbo);
 		
@@ -107,7 +112,6 @@ function Mesh() {
 	this.vbo = 0;
 	this.count = 0; // count of vertices to be drawn
 	this.matoffset = 0; // offset in model's materials
-	this.atlas = 0;
 }
 
 function Material() {

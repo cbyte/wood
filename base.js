@@ -1,10 +1,17 @@
-function Object(pos,scale,dir,model) {
+function Object(pos,scale,dir,model,atlas,defanim) {
 	this.model = model;
 	this.pos = pos;
 	this.scale = scale;
 	this.rotate = dir;
-	
+	if(atlas) {
+		this.atlas = new Atlas(0,0,new Array([0]));
+		this.atlas.clone(atlas);
+		this.atlas.play(defanim);
+	}
 	this.coll = new AABB(scale);
+	
+	//for editor
+	this.modeloffset=0;
 }
 
 Object.prototype.update = function() {}
@@ -35,7 +42,9 @@ var Input = new function() {
 	this.circum = 0;
 	this.comma = 0;
 	this.dot = 0;
+	this.p = 0;
 	this.r = 0;
+	this.c = 0;
 	
 	this.keyevent = function(e) {
 		if(e.type=="keydown") {
@@ -51,7 +60,9 @@ var Input = new function() {
 			if(e.which==192) Input.circum = 1; //circumflex
 			if(e.which==188) Input.comma = 1;
 			if(e.which==190) Input.dot = 1;
+			if(e.which==80) Input.p = 1;
 			if(e.which==82) Input.r = 1;
+			if(e.which==67) Input.c = 1;
 		}
 		else if(e.type=="keyup") {
 			if(e.which==32) Input.space = 0;
@@ -66,7 +77,9 @@ var Input = new function() {
 			if(e.which==192) Input.circum = 0; //circumflex
 			if(e.which==188) Input.comma = 0;
 			if(e.which==190) Input.dot = 0;
+			if(e.which==80) Input.p = 0;
 			if(e.which==82) Input.r = 0;
+			if(e.which==67) Input.c = 0;
 		}
 	}
 };
