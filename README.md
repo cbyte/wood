@@ -1,7 +1,7 @@
 wood
 ====
 
-A small game framework using webgl
+A small Game Framework using WebGL
 
 Imports models which were converted to Json with assimp2json.
 
