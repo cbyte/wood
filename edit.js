@@ -16,18 +16,18 @@ var Edit = new function() {
 	this.gamemode = 0; // 0 edit // 1 game
 	
 	this.init = function() {
-		this.addModel("plane.json",new Atlas(4,4,new Array([0],[0,100,0,1,2])));
+		//this.addModel("plane.json",new Atlas(4,4,new Array([0],[0,100,0,1,2])));
 		this.addModel("box.json");
-		this.addModel("wbox.json");
-		this.addModel("plant.json");
-		this.addModel("desk.json");
-		this.addModel("locker.json");
-		this.addModel("room.json");
-		this.addModel("roomdoorback.json");
-		this.addModel("roomdoor.json");
-		this.addModel("roomedge.json");
-		this.addModel("door.json");
-		this.addModel("computer.json");
+		//this.addModel("wbox.json");
+		//this.addModel("plant.json");
+		//this.addModel("desk.json");
+		//this.addModel("locker.json");
+		//this.addModel("room.json");
+		//this.addModel("roomdoorback.json");
+		//this.addModel("roomdoor.json");
+		//this.addModel("roomedge.json");
+		//this.addModel("door.json");
+		//this.addModel("computer.json");
 		this.cursor = new Object([0,0,0],[1,1,1],[0,0,0],this.models[0]);
 		
 		Camera.target = this.cursor;
