@@ -111,6 +111,8 @@ function Atlas(rows,cols,animation) {
 }
 
 function Texture(s) {
+	if(s=="") return;
+
 	var tex = gl.createTexture();
 	var image = new Image();
 	
@@ -128,6 +130,7 @@ function Texture(s) {
 	}
 	
 	image.onerror = function() { alert("failed to load image.");}
+
 	image.src = s;
 }
 
