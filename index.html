@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>wood/edit</title>
+	<script type="text/javascript" src="inc/gl-matrix-min.js"></script>
+	<script type="text/javascript" src="inc/webglhelper.js"></script>
+	<script type="text/javascript" src="src/base.js"></script>
+	<script type="text/javascript" src="src/mesh.js"></script>
+	<script type="text/javascript" src="src/draw.js"></script>
+	<script type="text/javascript" src="src/coll.js"></script>
+	<script type="text/javascript" src="edit.js"></script>
+	<link rel="stylesheet" href="style.css"/>
+  </head>
+  <body>
+  <div id="vshader">
+	precision mediump float;
+	
+	uniform mat4 matModelView;
+	uniform mat4 matModelViewProj;
+	uniform mat4 matModelViewTranspose;
+	uniform vec4 atlas;
+	attribute vec3 position;
+	attribute vec3 normal;
+	attribute vec2 texcoord;
+	
+	varying vec2 texCoord0;
+	varying vec4 vNormal;
+	varying vec4 vPos;
+	
+	varying vec4 vNormalWorld;
+	
+	uniform float dir;
+	
+	void main()
+	{
+		texCoord0.x = dir*texcoord.x*atlas.z + dir*atlas.x*atlas.z;
+		texCoord0.y = texcoord.y*atlas.a+atlas.y*atlas.a;
+		
+		vNormalWorld = matModelView*vec4(normal,0.0);
+		vNormal = matModelViewTranspose*vec4(normal,0.0);
+		vPos = matModelView * vec4(position, 1.0);
+		
+		gl_Position = matModelViewProj*vec4(position, 1.0);
+	}
+  </div>
+  <div id="fshader">
+	precision mediump float;
+	
+	uniform sampler2D img;
+	varying vec2 texCoord0;
+	varying vec4 vNormal;
+	varying vec4 vNormalWorld;
+	varying vec4 vPos;
+	
+	uniform vec2 window;
+	uniform mat4 matInvProjection;
+	
+	void main()
+	{
+		vec4 dirLight = vec4(0.0,0.0,0.5,0.0);
+		float att = max(0.9,dot(normalize(vNormalWorld),normalize(dirLight)));
+		gl_FragColor = vec4( att*(texture2D(img,texCoord0)).xyz , texture2D(img,texCoord0).a);
+		if(texture2D(img,texCoord0).a<0.5) discard;
+	}
+  </div>
+  <noscript>NO JAVASCRIPT</noscript>
+  <div id="COORD"></div>
+  <div id="WebGLCanvasCreationScript"></div>
+  <div id="edit"></div>
+	<script type="text/javascript" style="width:100%;height:100%">
+	 WebGLHelper.CreateGLCanvasInline('webgl', Init, NoWebGL); 
+  </script>
+  </body>
+</html>
