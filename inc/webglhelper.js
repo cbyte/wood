@@ -61,6 +61,8 @@ var WebGLHelper = {
             container.style.cssText = "position:relative;width:100%;height:100%";
 
             var cnv = document.createElement("canvas");
+			cnv.width = 640;
+			cnv.height = 480;
             container.appendChild(cnv);
 
             if (replace) {

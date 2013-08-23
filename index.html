@@ -57,9 +57,7 @@
 	
 	void main()
 	{
-		vec4 dirLight = vec4(0.0,0.0,0.5,0.0);
-		float att = max(0.9,dot(normalize(vNormalWorld),normalize(dirLight)));
-		gl_FragColor = vec4( att*(texture2D(img,texCoord0)).xyz , texture2D(img,texCoord0).a);
+		gl_FragColor = vec4( texture2D(img,texCoord0).xyz , texture2D(img,texCoord0).a);
 		if(texture2D(img,texCoord0).a<0.5) discard;
 	}
   </div>
