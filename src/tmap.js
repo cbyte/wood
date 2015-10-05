@@ -1,50 +1,83 @@
-var Tilemap = new function() {
-	this.data = 0; // { model [, scale[xyz], rotation[xyz], atlas, atlasdefanim] }
-	this.model = new Array();
-	this.atlas = new Array();
-	this.width = 0;
-	this.height = 0;
-	this.tilewidth = 1;
-	this.tileheight = 1;
-	
-	this.addModel = function(t) {
-		this.model[this.model.length] = t;
-	}
-	
-	this.addAtlas = function(a) {
-		this.atlas[this.atlas.length] = a;
-	}
-	
-	this.load = function(arr,x,y) {
-		this.data = arr;
-		this.width = x;
-		this.height = y;
-	}
-	
-	// layer indicates Z index
-	this.getRenderData = function(layer) {
-		if(!this.data) {
-			alert("no data"); return;
-		}
-		
-		var output = new Array();
-		var countobjects = 0;
-		for(var i=0;i<this.width*this.height;i++) {
-			var scale = this.data[countobjects][1]?this.data[countobjects][1]:[1,1,1];
-			var rot = this.data[countobjects][2]?this.data[countobjects][2]:[0,0,0];
-			var atlas = this.data[countobjects][3]?this.data[countobjects][3]:0;
-			var defanim = this.data[countobjects][4]?this.data[countobjects][4]:0;
-			
-			output[countobjects] = new Object([(i%this.width)*this.tilewidth,-Math.floor(i/this.width)*this.tileheight],layer]
-											  scale,
-											  rot,
-											  this.model[this.data[countobjects]], 
-											  atlas,
-											  defanim
-			);
-			countobjects++;
-		}
-		
-		return output;
-	}
+const CONSTRAINT_MUST_EXIST = 1
+const CONSTRAINT_MUST_NOT_EXIST = 2
+
+function Tile(x, y, z, tileGroup) {
+    return {x, y, z, tileGroup};
 };
+
+function Rule(otherTileGroup, vector, radius, constraint) {
+    return {otherTileGroup, vector, radius, constraint};
+};
+
+function TileMap() {
+    this.tileGroups = []; // array of type tile group
+    this.level = []; // array of type Tile
+    
+    this.getLevelTileInstances = function() {
+      self = this;
+      var result = [];
+
+      for(var levelTileId = 0; levelTileId < self.level.length; levelTileId++) {
+        var levelTile = self.level[levelTileId];
+        var success = true;
+        var successTileType = null;
+
+        // select tile group
+        var tileGroup = null;
+        for(var tileGroupId = 0; tileGroupId < self.tileGroups.length; tileGroupId++) {
+          if(self.tileGroups[tileGroupId].tileGroupName == levelTile.tileGroup) {
+            tileGroup = self.tileGroups[tileGroupId];
+          }
+        }
+
+        if(!tileGroup) {
+          console.log('tile group was not found, continuing')
+          continue;
+        }
+
+        var tileType = null;
+        // check every tile type in tile group
+        for(var tileTypeId = 0; tileTypeId < tileGroup.tileTypes.length; tileTypeId++) {
+          tileType = tileGroup.tileTypes[tileTypeId];
+
+          var rule = null;
+          var success = true;
+          var successTileType = null;
+
+          // check whether rules pass the test
+          for(var ruleId = 0; ruleId < tileType.rules.length; ruleId++) {
+            rule = tileType.rules[ruleId];
+
+            var foundRequiredTile = false;
+            for(var otherLevelTileId = 0; otherLevelTileId < self.level.length; otherLevelTileId++) {
+              // skip self test
+              if(otherLevelTileId === levelTileId) {
+                continue;
+              }
+
+              // check if in range and other type
+              var otherLevelTile = self.level[otherLevelTileId];
+              var distance = Math.sqrt(
+                  ((levelTile.x + rule.vector.x) - otherLevelTile.x)*((levelTile.x + rule.vector.x) - otherLevelTile.x)
+                  +((levelTile.y + rule.vector.y) - otherLevelTile.y)*((levelTile.y + rule.vector.y) - otherLevelTile.y)
+                  +((levelTile.z + rule.vector.z) - otherLevelTile.z)*((levelTile.z + rule.vector.z) - otherLevelTile.z)
+                  );
+              if(otherLevelTile.tileGroup == rule.otherTileGroup && distance <= rule.radius) {
+                foundRequiredTile = true;
+              }
+            }
+
+            if((rule.constraint == CONSTRAINT_MUST_EXIST && !foundRequiredTile) || (rule.constraint == CONSTRAINT_MUST_NOT_EXIST && foundRequiredTile)) {
+              success = false;
+            }
+          }
+
+          if(success) {
+            result.push({tile: levelTileId, tileType: tileType.name});
+          }
+        }
+      }
+
+      return result;
+    }
+}
