@@ -1,6 +1,6 @@
 var gl;
 
-var Camera = new function() {
+var Camera = function() {
 	this.x = 0;
 	this.y = 0;
 	this.z = 0;
@@ -8,43 +8,47 @@ var Camera = new function() {
 	this.pos = vec3.create();
 	this.dist = vec3.create();
 	this.follow = 0;
+
+	this.forward = vec3.create();
+	this.right = vec3.create();
 	
 	this.getView = function() {
+		var center = [0,0,1];
+
+		var rotationYaw = quat.create();
+		quat.setAxisAngle(rotationYaw, [0,1,0], Input.orientationX*Math.PI/180)
+		vec3.transformQuat(center, center, rotationYaw);
 		
-		var targetp = vec3.create();
-		vec3.set(targetp,this.target.pos[0],this.target.pos[1],this.target.pos[2]);
+		var rotationRoll = quat.create();
+		var right = vec3.create();
+		vec3.cross(right, center, [0,1,0]);
+		quat.setAxisAngle(rotationRoll, right, Input.orientationY*Math.PI/180)
+		vec3.transformQuat(center, center, rotationRoll);
+
+		vec3.normalize(center, center);
 		
-		if(this.follow)
-			vec3.add(this.pos, this.target.pos,this.dist);
-		
+		this.forward = vec3.clone(center);
+		this.right = right;
+
 		var view = mat4.create();
-		var right = this.pos;
-		
-		var dir = vec3.create();
-		vec3.sub(dir,this.pos,targetp);
-		vec3.normalize(dir,dir);
-		
-		var up = vec3.create();
-		//vec3.cross(up,dir,right);
-		//vec3.normalize(up,up);
-		
-		vec3.set(up,0,1,0)
-		
-		mat4.lookAt(view,this.pos, targetp, up );
-		//mat4.lookAt(view,[0,0,0], [0,0,1], [0,1,0] );
-		//console.log("lookat pos "+this.pos[0]+" "+this.pos[1]+" "+this.pos[2]
-		//				 + " target "+targetp[0]+" "+targetp[1]+" "+targetp[2]
-		//				 + " up "+up[0]+" "+up[1]+" "+up[2]
-		//);
-		
-		//mat4.lookAt(view,[0,0,0], [0,0,1], [0,1,0] );
+		vec3.add(center, center, this.pos);
+		mat4.lookAt(view, this.pos, center, [0,1,0] );
+
 		return view;
 	}
 	
 	this.getProjection = function() {
 		var proj = mat4.create();
-		mat4.perspective(proj,70,2,0.1,100.0);
+		mat4.perspective(proj,70,3/2,0.1,500.0);
 		return proj;
+	}
+
+	this.update = function(ts) {
+		
+		// move forwards or backwards
+		vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.forward), (Input.up-Input.dn) * ts);
+		// move left or right
+		vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.right), (Input.rt-Input.lt) * ts);
 	}
 };
 
@@ -144,12 +148,23 @@ var Renderer = new function() {
 	this.atlasloc = 0;
 	this.dirloc = 0;
 	this.objects = new Array();
+	this.camera = null;
+	this.canvas = null;
 	
 	this.initGL = function() {
-		gl = WebGLHelper.GetGLContext(document.getElementById("webgl"));
-		if(!gl)
+		this.canvas = document.querySelector('canvas')
+		try {
+			gl = this.canvas.getContext('webgl');
+		} catch (e) {
+			console.log('error',e)
+		}
+		
+		if(!gl) {
 			NoWebGL();
-		return;
+			return;
+		}
+
+		this.initShader();
 	}
 	
 	this.initShader = function() {
@@ -200,6 +215,10 @@ var Renderer = new function() {
 		
 	};
 
+	this.init = function(camera) {
+		this.camera = camera;
+	};
+
 	this.step = function() {
 		
 		gl.useProgram(this.program);
@@ -209,11 +228,11 @@ var Renderer = new function() {
 		gl.clear(gl.DEPTH_BUFFER_BIT|gl.COLOR_BUFFER_BIT);
 		
 		var proj = mat4.create();
-		var view = Camera.getView();
-		mat4.multiply(proj,Camera.getProjection(),view);
+		var view = this.camera.getView();
+		mat4.multiply(proj,this.camera.getProjection(),view);
 		
 		var projectionInv = mat4.create();
-		mat4.invert(projectionInv,Camera.getProjection());
+		mat4.invert(projectionInv,this.camera.getProjection());
 		
 		//this.objects.sort(function(a,b){ return a.sprite.texturename.localeCompare(b.sprite.texturename) })
 		

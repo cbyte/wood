@@ -45,6 +45,52 @@ var Input = new function() {
 	this.p = 0;
 	this.r = 0;
 	this.c = 0;
+
+	this.orientationX = 0;
+	this.orientationY = 0;
+
+	this.init = function() {
+		document.onkeydown = this.keyevent;
+		document.onkeyup = this.keyevent;
+		
+		document.addEventListener('pointerlockchange', this.mouseLockChange, false);
+		document.addEventListener('mozpointerlockchange', this.mouseLockChange, false);
+		document.addEventListener('webkitpointerlockchange', this.mouseLockChange, false);
+	};
+
+	this.mouseMove = function(e) {
+		var movementX = e.movementX||e.mozMovementX||e.webkitMovementX||0;
+		var movementY = e.movementY||e.mozMovementY||e.webkitMovementY||0;
+		Input.orientationX -= movementX;
+		Input.orientationY -= movementY;
+
+		if(Input.orientationX > 180) {
+			Input.orientationX -= 360;
+		}
+		if(Input.orientationX < -180) {
+			Input.orientationX += 360;
+		}
+		if(Input.orientationY >= 90) {
+			Input.orientationY = 89;
+		}
+		if(Input.orientationY <= -90) {
+			Input.orientationY = -89;
+		}
+
+		console.log(Input.orientationX,Input.orientationY);
+	}
+
+	this.mouseLockChange = function() {
+		if((document.pointerLockElement||document.mozPointerLockElement||document.webkitPointerLockElement)) {
+			if(!this.locked) {
+				document.addEventListener('mousemove', Input.mouseMove, false);
+				this.locked = true;
+			}
+		} else if(this.locked) {
+			document.removeEventListener('mousemove', Input.mouseMove, false);
+			this.locked = false;
+		}
+	}
 	
 	this.keyevent = function(e) {
 		if(e.type=="keydown") {
@@ -116,13 +162,17 @@ function rand(min,max) {
 
 function Init() {
 	Renderer.initGL();
-	Renderer.initShader();
+	Input.init();
 	
 	Edit.init();
 	
-	document.onkeydown=Input.keyevent;
-	document.onkeyup=Input.keyevent;
 	window.setInterval(Loop,1)
+
+	Renderer.canvas.requestPointerLock = Renderer.canvas.requestPointerLock||Renderer.canvas.mozRequestPointerLock||Renderer.canvas.webkitRequestPointerLock;
+	Renderer.canvas.onclick = function() {
+		Renderer.canvas.requestPointerLock();
+	}
+
 }
 
 function NoWebGL() {
