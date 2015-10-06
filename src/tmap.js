@@ -2,11 +2,11 @@ const CONSTRAINT_MUST_EXIST = 1
 const CONSTRAINT_MUST_NOT_EXIST = 2
 
 function Tile(x, y, z, tileGroup) {
-    return {x, y, z, tileGroup};
+    return {x: x, y: y, z: z, tileGroup: tileGroup};
 };
 
 function Rule(otherTileGroup, vector, radius, constraint) {
-    return {otherTileGroup, vector, radius, constraint};
+    return {otherTileGroup: otherTileGroup, vector: vector, radius: radius, constraint: constraint};
 };
 
 function TileMap() {
