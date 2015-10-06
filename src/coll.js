@@ -14,7 +14,9 @@ function testSphere(object, objectlist) {
 
 function AABB(r) {
 	this.c = [0,0,0]; // current position of entity is used as center 
-	this.r = vec3.fromValues(r[0],r[1],r[2]);
+	if(r && r.length===3) {
+		this.r = vec3.fromValues(r[0],r[1],r[2]);
+	}
 }
 
 function testAABB(object, objectlist) {
