@@ -1,17 +1,3 @@
-function Sphere(c, r) {
-  this.c = vec3.fromValues(c[0], c[1], c[2]);
-  this.r = r;
-}
-
-function testSphere(object, objectlist) {
-  for (var i = 0; i < objectlist.length; i++) {
-    if (vec3.dist(object.c, objectlist[i].spcoll.c) < object.r + objectlist[i].spcoll.r)
-      return 1;
-    continue;
-  }
-  return 0;
-}
-
 function AABB(r) {
   this.c = [0, 0, 0]; // current position of entity is used as center 
   if (r && r.length === 3) {

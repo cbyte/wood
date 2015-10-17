@@ -8,10 +8,12 @@ var Model = function(filename) {
 
   console.log(scene.materials.length + " material");
 
+  console.log(scene.materials)
+
   for (var numMat = 0; numMat < scene.materials.length; numMat++) {
     this.materials[numMat] = new Material();
     if (scene.materials[numMat].properties.length > 8)
-      this.materials[numMat].texfile = scene.materials[numMat].properties[8].value;
+      this.materials[numMat].texfile = scene.materials[numMat].properties[0].value;
     this.materials[numMat].tex = Resource.getTexture(this.materials[numMat].texfile);
   }
 
