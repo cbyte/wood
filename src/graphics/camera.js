@@ -7,11 +7,13 @@ var Camera = function() {
   this.dist = vec3.create();
   this.follow = 0;
 
+  // forward and right vector, indicating view direction
   this.forward = vec3.create();
   this.right = vec3.create();
 
   this.speedForward = 1;
   this.speedStrafe = 1;
+  this.speedForwardStrafe = 1/Math.sqrt(2);
 
   /**
    * Calculate the view matrix
@@ -60,9 +62,14 @@ var Camera = function() {
    * @param  {ts} timestamp
    */
   this.update = function(ts) {
-    // move forwards or backwards
-    vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.forward), (Input.up - Input.dn) * ts * this.speedForward);
-    // move left or right
-    vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.right), (Input.rt - Input.lt) * ts * this.speedStrafe);
+    if((Input.up||Input.dn) && (Input.rt||Input.lt)) {
+      vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.forward), (Input.up - Input.dn) * ts * this.speedForwardStrafe);
+      vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.right), (Input.rt - Input.lt) * ts * this.speedForwardStrafe);
+    } else {
+      // move forwards or backwards
+      vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.forward), (Input.up - Input.dn) * ts * this.speedForward);
+      // move left or right
+      vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.right), (Input.rt - Input.lt) * ts * this.speedStrafe);
+    }
   }
 };
