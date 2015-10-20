@@ -3,8 +3,13 @@ function Texture(s) {
 
   var tex = gl.createTexture();
   var image = new Image();
+  this.loaded = false;
 
   this.bind = function() {
+    if (!this.loaded) {
+      return;
+    }
+
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
@@ -19,6 +24,11 @@ function Texture(s) {
 
   image.onerror = function() {
     alert("failed to load image.");
+  }
+
+  image.onload = function() {
+    this.loaded = true;
+    console.log('Texture loaded')
   }
 
   image.src = s;
