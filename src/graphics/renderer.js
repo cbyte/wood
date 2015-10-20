@@ -11,22 +11,6 @@ var Renderer = new function() {
   this.camera = null;
   this.canvas = null;
 
-  this.initGL = function() {
-    this.canvas = document.querySelector('canvas')
-    try {
-      gl = this.canvas.getContext('webgl');
-    } catch (e) {
-      console.log('error', e)
-    }
-
-    if (!gl) {
-      NoWebGL();
-      return;
-    }
-
-    this.initShader();
-  }
-
   this.initShader = function() {
     this.program = gl.createProgram();
     var vshader = document.getElementById("vshader").textContent;
@@ -80,7 +64,6 @@ var Renderer = new function() {
   };
 
   this.step = function() {
-
     gl.useProgram(this.program);
 
     gl.clearColor(1.0, 1.0, 1.0, 1);
@@ -122,7 +105,7 @@ var Renderer = new function() {
       gl.uniformMatrix4fv(gl.getUniformLocation(this.program, "matModelViewProj"), false, modelViewProjection);
       gl.uniformMatrix4fv(gl.getUniformLocation(this.program, "matModelViewTranspose"), false, modelViewTranspose);
 
-      gl.uniform2fv(gl.getUniformLocation(this.program, "window"), [800.0, 400.0]);
+      //gl.uniform2fv(gl.getUniformLocation(this.program, "window"), [800.0, 400.0]);
 
       DrawModel(this.objects[i].model, this.objects[i].atlas);
     }
