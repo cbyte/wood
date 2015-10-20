@@ -63,7 +63,7 @@ var Renderer = new function() {
     this.camera = camera;
   };
 
-  this.step = function() {
+  this.draw = function() {
     gl.useProgram(this.program);
 
     gl.clearColor(1.0, 1.0, 1.0, 1);
@@ -109,12 +109,6 @@ var Renderer = new function() {
 
       DrawModel(this.objects[i].model, this.objects[i].atlas);
     }
-
-    //default object
-    this.objects = new Array();
   }
 
-  this.render = function(objects) {
-    this.objects = this.objects.concat(objects);
-  };
 };

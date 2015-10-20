@@ -11,9 +11,9 @@ var Camera = function() {
   this.forward = vec3.create();
   this.right = vec3.create();
 
-  this.speedForward = 1;
-  this.speedStrafe = 1;
-  this.speedForwardStrafe = 1/Math.sqrt(2);
+  this.speedForward = .01;
+  this.speedStrafe = .01;
+  this.speedForwardStrafe = .01 / Math.sqrt(2);
 
   /**
    * Calculate the view matrix
@@ -62,7 +62,7 @@ var Camera = function() {
    * @param  {ts} timestamp
    */
   this.update = function(ts) {
-    if((Input.up||Input.dn) && (Input.rt||Input.lt)) {
+    if ((Input.up || Input.dn) && (Input.rt || Input.lt)) {
       vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.forward), (Input.up - Input.dn) * ts * this.speedForwardStrafe);
       vec3.scaleAndAdd(this.pos, this.pos, vec3.clone(this.right), (Input.rt - Input.lt) * ts * this.speedForwardStrafe);
     } else {
