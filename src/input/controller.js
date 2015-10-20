@@ -30,9 +30,9 @@ var Input = new function() {
   };
 
   this.mouseMove = function(e) {
-    var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-    var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-    
+    var movementX = e.movementX || e.mozMovementX || 0;
+    var movementY = e.movementY || e.mozMovementY || 0;
+
     var changeX = movementX * Input.mouseSensivityX;
     var changeY = movementY * Input.mouseSensivityY;
 
@@ -40,7 +40,7 @@ var Input = new function() {
       Input.orientationX = Input.orientationX - changeX - 360;
     } else if (Input.orientationX - changeX < -180) {
       Input.orientationX = Input.orientationX - changeX + 360;
-    }  else {
+    } else {
       Input.orientationX -= changeX;
     }
 
