@@ -1,0 +1,23 @@
+{
+  "name": "wood",
+  "homepage": "https://github.com/cbyte/wood",
+  "authors": [
+    "admin@chocobyte.com <admin@chocobyte.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "Private",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "gl-matrix": "~2.3.1",
+    "q": "1.0.1"
+  }
+}
