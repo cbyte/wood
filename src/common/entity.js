@@ -1,4 +1,4 @@
-function Object(pos, scale, dir, model, atlas, defanim) {
+function Entity(pos, scale, dir, model, atlas, defanim) {
   this.model = model;
   this.pos = pos;
   this.scale = scale;
@@ -14,4 +14,4 @@ function Object(pos, scale, dir, model, atlas, defanim) {
   this.modeloffset = 0;
 }
 
-Object.prototype.update = function() {}
+Entity.prototype.update = function() {}

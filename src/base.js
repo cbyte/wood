@@ -8,24 +8,30 @@ var Engine = new function() {
     canvas.onclick = function() {
       canvas.requestPointerLock();
     }
-
-    Game.init();
   }
 
   this.noWebGL = function() {
-    document.body.innerHTML = "NOWEBGL"
+    document.body.innerHTML += "NOWEBGL"
   }
 
   this.initGL = function() {
     this.canvas = document.querySelector('canvas')
     try {
-      gl = this.canvas.getContext('webgl');
+      gl = this.canvas.getContext('experimental-webgl')
     } catch (e) {
       console.log('error', e)
     }
 
+    if(!gl) {
+    	try {
+	      gl = this.canvas.getContext('webgl')
+	    } catch (e) {
+	      console.log('error', e)
+	    }
+    }
+
     if (!gl) {
-      NoWebGL();
+      this.noWebGL();
       return;
     }
 

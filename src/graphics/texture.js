@@ -1,18 +1,34 @@
 function Texture(s) {
   if (s == "") return;
 
-  var tex = gl.createTexture();
-  var image = new Image();
-  this.loaded = false;
+  this.filename = s
 
-  this.bind = function() {
-    if (!this.loaded) {
-      return;
+  this.init = function() {
+    var d = Q.defer();
+
+    this.tex = gl.createTexture();
+    this.image = new Image();
+    
+    this.image.onerror = function() {
+      alert("failed to load image.");
+      d.reject(false);
     }
 
-    gl.bindTexture(gl.TEXTURE_2D, tex);
+    this.image.onload = function() {
+      console.log('Texture loaded')
+      d.resolve(true);
+    }
+
+    this.image.src = s;
+
+    return d.promise;
+  }
+
+  this.bind = function() {
+
+    gl.bindTexture(gl.TEXTURE_2D, this.tex);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.image);
 
     //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -21,15 +37,4 @@ function Texture(s) {
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
   }
-
-  image.onerror = function() {
-    alert("failed to load image.");
-  }
-
-  image.onload = function() {
-    this.loaded = true;
-    console.log('Texture loaded')
-  }
-
-  image.src = s;
 }

@@ -56,6 +56,7 @@ var Renderer = new function() {
     gl.enable(gl.DEPTH_TEST);
     //gl.depthFunc(gl.LEQUAL);
     //gl.clearDepth(1.0);
+    gl.enable(gl.CULL_FACE)
 
   };
 
@@ -104,8 +105,6 @@ var Renderer = new function() {
       gl.uniformMatrix4fv(gl.getUniformLocation(this.program, "matModelView"), false, modelView);
       gl.uniformMatrix4fv(gl.getUniformLocation(this.program, "matModelViewProj"), false, modelViewProjection);
       gl.uniformMatrix4fv(gl.getUniformLocation(this.program, "matModelViewTranspose"), false, modelViewTranspose);
-
-      //gl.uniform2fv(gl.getUniformLocation(this.program, "window"), [800.0, 400.0]);
 
       DrawModel(this.objects[i].model, this.objects[i].atlas);
     }
