@@ -12,6 +12,8 @@ function Entity(pos, scale, dir, model, atlas, defanim) {
 
   //for editor
   this.modeloffset = 0;
+
+  this.renderDisableDepthBuffer = false;
 }
 
 Entity.prototype.update = function() {}

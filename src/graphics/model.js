@@ -1,14 +1,14 @@
 var Model = function(filename) {
   this.filename = filename;
-  console.log('model',this.filename)
+  console.log('model', this.filename)
 
   this.init = function() {
     var self = this;
-    console.log('init model',this.filename)
+    console.log('init model', this.filename)
     var d = Q.defer();
 
     var file = new XMLHttpRequest();
-    file.onload = function(){
+    file.onload = function() {
 
       var scene = JSON.parse(file.responseText);
       console.log(scene)
@@ -21,8 +21,14 @@ var Model = function(filename) {
 
       for (var numMat = 0; numMat < scene.materials.length; numMat++) {
         self.materials[numMat] = new Material();
-        if (scene.materials[numMat].properties.length > 8)
-          self.materials[numMat].texfile = scene.materials[numMat].properties[0].value;
+        var textureIndex = 0;
+        for (var i = 0; i < scene.materials[numMat].properties.length; i++) {
+          if (scene.materials[numMat].properties[i].key == '$tex.file') {
+            textureIndex = i;
+          }
+        }
+
+        self.materials[numMat].texfile = scene.materials[numMat].properties[textureIndex].value;
         self.materials[numMat].tex = Resource.get(self.materials[numMat].texfile);
       }
 
@@ -72,9 +78,9 @@ var Model = function(filename) {
 
       console.log(self.filename + " loaded (" + self.meshes.length + " meshes)");
       d.resolve(true);
-      
+
     }
-    file.onerror = function(){
+    file.onerror = function() {
       console.log('error loading model')
       d.reject(false);
     }
@@ -83,7 +89,7 @@ var Model = function(filename) {
 
     return d.promise;
   }
-  
+
 }
 
 //GLOBAL last bound texture
@@ -107,7 +113,7 @@ function DrawModel(m, atlas) {
       gl.uniform1f(Renderer.dirloc, atlas.dir);
       atlas.animate();
       gl.uniform4f(Renderer.atlasloc, atlas.getU(), atlas.getV(),
-      atlas.getSizeU(), atlas.getSizeV());
+        atlas.getSizeU(), atlas.getSizeV());
     } else {
       gl.uniform4f(Renderer.atlasloc, 0.0, 0.0, 1.0, 1.0);
       gl.uniform1f(Renderer.dirloc, 1.0);

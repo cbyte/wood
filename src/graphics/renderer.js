@@ -84,6 +84,10 @@ var Renderer = new function() {
       var obj = this.objects[i];
       if (obj == 0) continue;
 
+      if (obj.renderDisableDepthBuffer) {
+        gl.depthMask(false);
+      }
+
       var modelView = mat4.create();
       mat4.identity(modelView);
       mat4.translate(modelView, modelView, [obj.pos[0], obj.pos[1], obj.pos[2]]);
@@ -107,6 +111,10 @@ var Renderer = new function() {
       gl.uniformMatrix4fv(gl.getUniformLocation(this.program, "matModelViewTranspose"), false, modelViewTranspose);
 
       DrawModel(this.objects[i].model, this.objects[i].atlas);
+
+      if (obj.renderDisableDepthBuffer) {
+        gl.depthMask(true);
+      }
     }
   }
 
