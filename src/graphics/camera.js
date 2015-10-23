@@ -52,7 +52,8 @@ var Camera = function() {
    */
   this.getProjection = function() {
     var proj = mat4.create();
-    mat4.perspective(proj, 70, 16 / 9, 0.1, 500.0);
+    var aspect = Engine.canvas.clientWidth / Engine.canvas.clientHeight;
+    mat4.perspective(proj, 70, aspect, 0.1, 500.0);
     return proj;
   }
 

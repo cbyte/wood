@@ -65,6 +65,15 @@ var Renderer = new function() {
   };
 
   this.draw = function() {
+    // resize to client's window size
+    var clientWidth = gl.canvas.clientWidth;
+    var clientHeight = gl.canvas.clientHeight;
+    if (gl.canvas.width != clientWidth || gl.canvas.height != clientHeight) {
+       gl.canvas.width = clientWidth;
+       gl.canvas.height = clientHeight;
+    }
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
     gl.useProgram(this.program);
 
     gl.clearColor(1.0, 1.0, 1.0, 1);

@@ -3,7 +3,8 @@ var Engine = new function() {
     this.initGL();
     Input.init();
 
-    var canvas = document.querySelector('canvas');
+    this.canvas = document.querySelector('canvas');
+    var canvas = this.canvas;
     canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
     canvas.onclick = function() {
       canvas.requestPointerLock();
