@@ -22,8 +22,9 @@ function Rule(otherTileGroup, vector, radius, constraint) {
 function TileMap() {
   this.tileGroups = []; // array of type tile group
   this.level = []; // array of type Tile
+}
 
-  this.getLevelTileInstances = function() {
+TileMap.prototype.getLevelTileInstances = function() {
     self = this;
     var result = [];
 
@@ -65,7 +66,7 @@ function TileMap() {
               continue;
             }
 
-            // check if in range and other type
+            // check if in range and equals other type
             var otherLevelTile = self.level[otherLevelTileId];
             var distance = Math.sqrt(
               ((levelTile.x + rule.vector.x) - otherLevelTile.x) * ((levelTile.x + rule.vector.x) - otherLevelTile.x) + ((levelTile.y + rule.vector.y) - otherLevelTile.y) * ((levelTile.y + rule.vector.y) - otherLevelTile.y) + ((levelTile.z + rule.vector.z) - otherLevelTile.z) * ((levelTile.z + rule.vector.z) - otherLevelTile.z)
@@ -91,4 +92,3 @@ function TileMap() {
 
     return result;
   }
-}

@@ -11,13 +11,11 @@ var Model = function(filename) {
     file.onload = function() {
 
       var scene = JSON.parse(file.responseText);
-      console.log(scene)
+      
       self.meshes = new Array();
       self.materials = new Array();
 
-      console.log(scene.materials.length + " material");
-
-      console.log(scene.materials)
+      //console.log(scene.materials.length + " material");
 
       for (var numMat = 0; numMat < scene.materials.length; numMat++) {
         self.materials[numMat] = new Material();
@@ -104,7 +102,7 @@ function DrawModel(m, atlas) {
   for (var i = 0; i < m.meshes.length; i++) {
     // bind texture but not for every mesh again!
     if (m.materials[m.meshes[i].matoffset].texfile != lasttex || lasttex == 0) {
-      Resource.get(m.materials[m.meshes[i].matoffset].texfile).bind();
+      Resource.get('content/'+m.materials[m.meshes[i].matoffset].texfile).bind();
       lasttex = m.materials[m.meshes[i].matoffset].texfile;
     }
 

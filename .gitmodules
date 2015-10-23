@@ -1,7 +1,0 @@
-[submodule "inc/gl-matrix"]
-	path = inc/gl-matrix
-	url = https://github.com/toji/gl-matrix.git
-
-[submodule "inc/q"]
-	path = inc/q
-	url = https://github.com/kriskowal/q.git
