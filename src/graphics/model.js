@@ -96,7 +96,6 @@ var Model = function(filename) {
 var lasttex = 0;
 
 function DrawModel(m, atlas) {
-
   gl.enableVertexAttribArray(Renderer.posloc);
   gl.enableVertexAttribArray(Renderer.norloc);
   gl.enableVertexAttribArray(Renderer.texloc);
