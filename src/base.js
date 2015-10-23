@@ -6,9 +6,6 @@ var Engine = new function() {
     this.canvas = document.querySelector('canvas');
     var canvas = this.canvas;
     canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
-    canvas.onclick = function() {
-      canvas.requestPointerLock();
-    }
   }
 
   this.noWebGL = function() {
