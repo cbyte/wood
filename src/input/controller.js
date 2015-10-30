@@ -27,9 +27,33 @@ var Input = new function() {
     document.addEventListener('pointerlockchange', this.mouseLockChange, false);
     document.addEventListener('mozpointerlockchange', this.mouseLockChange, false);
     document.addEventListener('webkitpointerlockchange', this.mouseLockChange, false);
+
+    document.addEventListener('mousemove', Input.mouseMoveUpdateScreenPosition, false)
+
+    document.addEventListener('mousedown', this.activateRightClickCameraMotion, false);
+    document.addEventListener('mouseup', this.deactivateRightClickCameraMotion, false);
   };
 
-  this.mouseMove = function(e) {
+  this.activateRightClickCameraMotion = function(e) {
+    if (e.button == 2) {
+      document.addEventListener('mousemove', Input.mouseMoveUpdateOrientation, false);
+    }
+  }
+
+  this.deactivateRightClickCameraMotion = function(e) {
+    if (e.button == 2) {
+      document.removeEventListener('mousemove', Input.mouseMoveUpdateOrientation, false);
+    }
+  }
+
+  this.mouseMoveUpdateScreenPosition = function(e) {
+    Input.screenX = e.clientX / gl.canvas.clientWidth
+    Input.screenY = e.clientY / gl.canvas.clientHeight
+
+    //console.log(this.screenX, this.screenY)
+  }
+
+  this.mouseMoveUpdateOrientation = function(e) {
     var movementX = e.movementX || e.mozMovementX || 0;
     var movementY = e.movementY || e.mozMovementY || 0;
 
@@ -56,11 +80,11 @@ var Input = new function() {
   this.mouseLockChange = function() {
     if ((document.pointerLockElement || document.mozPointerLockElement || document.webkitPointerLockElement)) {
       if (!this.locked) {
-        document.addEventListener('mousemove', Input.mouseMove, false);
+        document.addEventListener('mousemove', Input.mouseMoveUpdateOrientation, false);
         this.locked = true;
       }
     } else if (this.locked) {
-      document.removeEventListener('mousemove', Input.mouseMove, false);
+      document.removeEventListener('mousemove', Input.mouseMoveUpdateOrientation, false);
       this.locked = false;
     }
   }

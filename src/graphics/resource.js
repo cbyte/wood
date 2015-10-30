@@ -11,8 +11,6 @@ var Resource = new function() {
     for(var i=0;i<this.resources.length;i++){
       loadResources.push(this.resources[i].init())
     }
-
-    console.log('loadResources',loadResources)
     
     return Q.all([loadResources]);
   }

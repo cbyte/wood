@@ -1,10 +1,5 @@
 var Camera = function() {
-  this.x = 0;
-  this.y = 0;
-  this.z = 0;
   this.pos = vec3.create();
-  this.dist = vec3.create();
-
   // forward and right vector, indicating view direction
   this.forward = vec3.create();
   this.right = vec3.create();
@@ -58,5 +53,5 @@ Camera.prototype.getProjection = function() {
  * @param  {ts} timestamp
  */
 Camera.prototype.update = function(ts) {
-  
+
 }

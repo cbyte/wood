@@ -5,13 +5,15 @@ var Model = function(filename) {
   this.init = function() {
     var self = this;
     console.log('init model', this.filename)
+
     var d = Q.defer();
 
     var file = new XMLHttpRequest();
     file.onload = function() {
 
       var scene = JSON.parse(file.responseText);
-      
+      //console.log(scene)
+
       self.meshes = new Array();
       self.materials = new Array();
 
@@ -75,6 +77,8 @@ var Model = function(filename) {
       }
 
       console.log(self.filename + " loaded (" + self.meshes.length + " meshes)");
+      self.source = scene;
+      
       d.resolve(true);
 
     }

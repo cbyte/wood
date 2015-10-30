@@ -69,8 +69,8 @@ var Renderer = new function() {
     var clientWidth = gl.canvas.clientWidth;
     var clientHeight = gl.canvas.clientHeight;
     if (gl.canvas.width != clientWidth || gl.canvas.height != clientHeight) {
-       gl.canvas.width = clientWidth;
-       gl.canvas.height = clientHeight;
+      gl.canvas.width = clientWidth;
+      gl.canvas.height = clientHeight;
     }
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -95,6 +95,11 @@ var Renderer = new function() {
 
       if (obj.renderDisableDepthBuffer) {
         gl.depthMask(false);
+      }
+
+      if (obj.renderBlend) {
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       }
 
       var modelView = mat4.create();
@@ -123,6 +128,10 @@ var Renderer = new function() {
 
       if (obj.renderDisableDepthBuffer) {
         gl.depthMask(true);
+      }
+
+      if (gl.renderBlend) {
+        gl.disable(gl.BLEND)
       }
     }
   }
