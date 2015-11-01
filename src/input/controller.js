@@ -19,6 +19,11 @@ var Input = new function() {
   this.orientationY = 0;
   this.mouseSensivityX = 0.1;
   this.mouseSensivityY = 0.1;
+  this.mouse0 = 0;
+  this.mouse1 = 0;
+  this.mouse2 = 0;
+  this.screenX = 0;
+  this.screenY = 0;
 
   this.init = function() {
     document.onkeydown = this.keyevent;
@@ -32,6 +37,8 @@ var Input = new function() {
 
     document.addEventListener('mousedown', this.activateRightClickCameraMotion, false);
     document.addEventListener('mouseup', this.deactivateRightClickCameraMotion, false);
+    document.addEventListener('mousedown', this.mouseEvent, false);
+    document.addEventListener('mouseup', this.mouseEvent, false);
   };
 
   this.activateRightClickCameraMotion = function(e) {
@@ -122,6 +129,18 @@ var Input = new function() {
       if (e.which == 80) Input.p = 0;
       if (e.which == 82) Input.r = 0;
       if (e.which == 67) Input.c = 0;
+    }
+  }
+
+  this.mouseEvent = function(e) {
+    if(e.type == 'mousedown') {
+      if(e.button == 0) Input.mouse0 = 1;
+      if(e.button == 1) Input.mouse1 = 1;
+      if(e.button == 2) Input.mouse2 = 1;
+    } else if (e.type == 'mouseup') {
+      if(e.button == 0) Input.mouse0 = 0;
+      if(e.button == 1) Input.mouse1 = 0;
+      if(e.button == 2) Input.mouse2 = 0;
     }
   }
 };
