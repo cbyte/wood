@@ -1,4 +1,3 @@
-
 var users = []
 var sessions = []
 
@@ -42,7 +41,7 @@ io.on('connection', function(socket) {
   sendSessionsToAll();
 
   socket.on('create-session', function(peerId, password, callback) {
-    var sessionId = peerId+Math.floor(100*Math.random());
+    var sessionId = peerId + Math.floor(100 * Math.random());
     sessions.push(new Session(sessionId, peerId, password))
     sendSessionsToAll();
     callback(sessionId);
@@ -50,20 +49,20 @@ io.on('connection', function(socket) {
 
   // ***delete this method?*** and remove an inactive session automatically if there has been no users for awhile
   socket.on('remove-session', function(peerId, sessionId, password) {
-    for(var i=0; i<sessions.length; i++) {
+    for (var i = 0; i < sessions.length; i++) {
       var session = sessions[i];
 
-      if(session.id == sessionId && session.owner == peerId && password == session.getPassword()) {
+      if (session.id == sessionId && session.owner == peerId && password == session.getPassword()) {
         sessions.splice(i, 1);
         sendSessionsToAll();
         return;
       }
     }
   });
-  
+
   // delete session if owner disconnects
-  socket.on('disconnect', function(){
-      
+  socket.on('disconnect', function() {
+
   })
 });
 
