@@ -1,5 +1,5 @@
 var Camera = function() {
-  this.pos = vec3.create();
+  this.position = vec3.create();
   // forward and right vector, indicating view direction
   this.forward = vec3.create();
   this.right = vec3.create();
@@ -14,13 +14,13 @@ Camera.prototype.getView = function() {
   var center = [0, 0, 1];
 
   var rotationYaw = quat.create();
-  quat.setAxisAngle(rotationYaw, [0, 1, 0], Input.orientationX * Math.PI / 180)
+  quat.setAxisAngle(rotationYaw, [0, 1, 0], Input.orientationX * DEGREE_TO_RAD);
   vec3.transformQuat(center, center, rotationYaw);
 
   var rotationRoll = quat.create();
   var right = vec3.create();
   vec3.cross(right, center, [0, 1, 0]);
-  quat.setAxisAngle(rotationRoll, right, Input.orientationY * Math.PI / 180)
+  quat.setAxisAngle(rotationRoll, right, Input.orientationY * DEGREE_TO_RAD);
   vec3.transformQuat(center, center, rotationRoll);
 
   vec3.normalize(center, center);
@@ -29,8 +29,8 @@ Camera.prototype.getView = function() {
   this.right = right;
 
   var view = mat4.create();
-  vec3.add(center, center, this.pos);
-  mat4.lookAt(view, this.pos, center, [0, 1, 0]);
+  vec3.add(center, center, this.position);
+  mat4.lookAt(view, this.position, center, [0, 1, 0]);
 
   return view;
 }

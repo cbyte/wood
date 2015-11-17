@@ -1,6 +1,6 @@
 // Get to know other peers and handle data connections
 var Replicator = new(function Replicator() {
-  this.SERVER_IP = "2.241.24.198"
+  this.SERVER_IP = "127.0.0.1"
 
   this.users = []; // users connected to the broker server
   this.sessions = []; // available replication sessions

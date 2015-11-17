@@ -103,15 +103,16 @@ var Renderer = new function() {
       }
 
       var modelView = mat4.create();
-      if (!obj.rotationQuat) {
-        mat4.identity(modelView);
-        mat4.translate(modelView, modelView, [obj.pos[0], obj.pos[1], obj.pos[2]]);
-        mat4.rotate(modelView, modelView, obj.rotate[0], [1, 0, 0]);
-        mat4.rotate(modelView, modelView, obj.rotate[1], [0, 1, 0]);
-        mat4.rotate(modelView, modelView, obj.rotate[2], [0, 0, 1]);
-      } else {
-        mat4.fromRotationTranslation(modelView, obj.rotationQuat, obj.pos);
-      }
+
+      // if (!obj.rotationQuat) {
+      //   mat4.identity(modelView);
+      //   mat4.translate(modelView, modelView, [obj.position[0], obj.position[1], obj.position[2]]);
+      //   mat4.rotate(modelView, modelView, obj.rotate[0], [1, 0, 0]);
+      //   mat4.rotate(modelView, modelView, obj.rotate[1], [0, 1, 0]);
+      //   mat4.rotate(modelView, modelView, obj.rotate[2], [0, 0, 1]);
+      // } else {
+      mat4.fromRotationTranslation(modelView, obj.rotation, obj.position);
+      // }
 
       mat4.scale(modelView, modelView, [obj.scale[0], obj.scale[1], obj.scale[2]]);
 
