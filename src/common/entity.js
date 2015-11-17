@@ -17,8 +17,6 @@ function Entity(model, atlas, defanim) {
   this.modeloffset = 0;
 
   this.renderDisableDepthBuffer = false;
-
-  console.log(this)
 }
 
 Entity.prototype.setRotation = function(yaw, pitch, roll) {
@@ -26,6 +24,18 @@ Entity.prototype.setRotation = function(yaw, pitch, roll) {
   quat.rotateX(this.rotation, this.rotation, roll * DEGREE_TO_RAD);
   quat.rotateY(this.rotation, this.rotation, pitch * DEGREE_TO_RAD);
   quat.rotateZ(this.rotation, this.rotation, yaw * DEGREE_TO_RAD);
+}
+
+Entity.prototype.setRotationX = function(degree) {
+  quat.rotateX(this.rotation, this.rotation, degree * DEGREE_TO_RAD);
+}
+
+Entity.prototype.setRotationY = function(degree) {
+  quat.rotateY(this.rotation, this.rotation, degree * DEGREE_TO_RAD);
+}
+
+Entity.prototype.setRotationZ = function(degree) {
+  quat.rotateZ(this.rotation, this.rotation, degree * DEGREE_TO_RAD);
 }
 
 Entity.prototype.update = function() {}
