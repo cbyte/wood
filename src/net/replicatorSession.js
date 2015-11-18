@@ -98,8 +98,8 @@ ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
   var variables = [];
   for (var variableIndex in this.variables) {
     var variable = this.variables[variableIndex];
-    // send owner's variables and variables shared by everyone
-    if (variable.owner == peerId || !variable.owner) {
+    // send owner's variables and variables shared by everyone (server's variables)
+    if (variable.owner == peerId || variable.owner == Replicator.id) {
       variables.push({
         identifier: variable.identifier,
         type: variable.type,
@@ -162,7 +162,7 @@ ReplicatorSession.prototype.serverTick = function() {
     if ((variable.destination == REPLICATE_SVCL || variable.destination == REPLICATE_CLSVCL) && variable.type == REPLICATE_UNRELIABLE) {
       var varData = {
         id: variable.identifier,
-        val: variable.parent[variable.name],
+        val: variable.serializeFn(variable.parent[variable.name]),
       };
       variables.push(varData)
     }
@@ -210,7 +210,7 @@ ReplicatorSession.prototype.clientTick = function() {
       }*/
       var varData = {
         id: variable.identifier,
-        val: variable.parent[variable.name],
+        val: variable.serializeFn(variable.parent[variable.name]),
       };
       variables.push(varData)
     }
@@ -284,7 +284,6 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
         this.variables[variable.identifier].identifier = variable.identifier;
         this.variables[variable.identifier].type = variable.type;
         this.variables[variable.identifier].destination = variable.destination;
-        this.variables[variable.identifier].owner = Replicator.id;
       }
 
       this.onResponsibleVariablesNotice();
@@ -295,8 +294,8 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
       if (this.variables[data.id]) {
         console.log('set reliable', data.id, data.val)
 
-        var obj = this.variables[data.id];
-        obj.parent[obj.name] = data.val;
+        var variable = this.variables[data.id];
+        variable.parent[variable.name] = variable.deserializeFn(data.val);
       }
       break;
 
@@ -306,17 +305,15 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
 
       for (var i = 0; i < allData.length; i++) {
         var data = allData[i];
+        var variable = this.variables[data.id];
 
         // todo: Check if the other peer was allowed to change the local data
-        if (this.variables[data.id]) {
-          if (this.variables[data.id].owner == Replicator.id) {
+        if (variable) {
+          if (variable.destination != REPLICATE_CLSVCL && variable.destination != REPLICATE_SVCL) {
             continue;
           }
-
-          // console.log('set', data.id, data.val)
-
-          var obj = this.variables[data.id];
-          obj.parent[obj.name] = data.val;
+          // console.log(data)
+          variable.parent[variable.name] = variable.deserializeFn(data.val);
         }
       }
       break;
@@ -332,7 +329,7 @@ ReplicatorSession.prototype.onReceive = function(other, data) {
   // If server: Order the snapshot's variables after the snapshot sequence number, store historically
   // If client: Update variables with snapshot if snapshot is newer than old one
 
-  // console.log('received', data.ts)
+  // console.log('received', data)
 
   if (data.ts >= other.lastReceivedGameTime) {
     other.lastReceivedGameTime = data.ts; // the time of the last received snapshot
