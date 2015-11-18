@@ -89,6 +89,7 @@ ReplicatorSession.prototype.sendReliableMessage = function(other, message) {
   other.unackedReliableMessages.push(message);
 }
 
+// send for each peer-authorized variable its information to that peer
 ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
   if (!this.host) {
     return;
@@ -97,7 +98,8 @@ ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
   var variables = [];
   for (var variableIndex in this.variables) {
     var variable = this.variables[variableIndex];
-    if (variable.owner == peerId) {
+    // send owner's variables and variables shared by everyone
+    if (variable.owner == peerId || !variable.owner) {
       variables.push({
         identifier: variable.identifier,
         type: variable.type,

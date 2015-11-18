@@ -1,3 +1,19 @@
+const REPLICATE_RELIABLE = 1
+const REPLICATE_UNRELIABLE = 2
+
+const REPLICATE_SVCL = 1
+const REPLICATE_CLSV = 2
+const REPLICATE_CLSVCL = 3
+
+const REPLICATE_PEER_IS_SERVER = 1;
+const REPLICATE_PEER_IS_CLIENT = 2;
+
+const MESSAGE_REQUEST_JOIN = 1;
+const MESSAGE_GRANT_JOIN = 2;
+const MESSAGE_SET_VARIABLE_RELIABLE = 3;
+const MESSAGE_DATA = 4;
+const MESSAGE_NOTICE_RESPONSIBLE_VARIABLES = 5;
+
 // Get to know other peers and handle data connections
 var Replicator = new(function Replicator() {
   this.SERVER_IP = "127.0.0.1"
