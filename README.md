@@ -1,4 +1,4 @@
-wood
+wood.js
 ====
 
 A small game framework using WebGL
