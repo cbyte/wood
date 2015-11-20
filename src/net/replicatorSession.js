@@ -115,15 +115,19 @@ ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
 }
 
 ReplicatorSession.prototype.bindReplicationVariable = function(identifier, parentObject, variableName, deserializeReadFn, serializeWriteFn) {
+
   var variable = this.variables[identifier]
 
   if (!variable) {
     variable = {};
   }
+  variable.identifier = identifier;
   variable.parent = parentObject;
   variable.name = variableName;
   variable.deserializeFn = deserializeReadFn;
   variable.serializeFn = serializeWriteFn;
+
+  console.log('bound', variable.identifier)
 
   if (variable.type == REPLICATE_RELIABLE) {
     var session = this;
@@ -242,6 +246,11 @@ ReplicatorSession.prototype.onResponsibleVariablesNotice = function() {
 
 }
 
+// this will be executed when data had been received and the variables were set
+ReplicatorSession.prototype.onMessageDataUpdated = function() {
+
+}
+
 // 
 ReplicatorSession.prototype.onMessage = function(other, data) {
   switch (data.type) {
@@ -313,9 +322,17 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
             continue;
           }
           // console.log(data)
-          variable.parent[variable.name] = variable.deserializeFn(data.val);
+          if (typeof variable.deserializeFn == 'undefined') {
+            // console.log(variable.identifier, 'error: no deserializeFn specified');
+          } else {
+            var value = variable.deserializeFn(data.val);
+            variable.parent[variable.name] = value;
+            variable.history = value;
+          }
         }
       }
+
+      this.onMessageDataUpdated();
       break;
 
     default:
@@ -330,6 +347,10 @@ ReplicatorSession.prototype.onReceive = function(other, data) {
   // If client: Update variables with snapshot if snapshot is newer than old one
 
   // console.log('received', data)
+  var self = this;
+
+  // track when the last update came to predict from this point of time to the future
+  this.lastReceivedGameTime = window.performance.now();
 
   if (data.ts >= other.lastReceivedGameTime) {
     other.lastReceivedGameTime = data.ts; // the time of the last received snapshot
@@ -340,7 +361,14 @@ ReplicatorSession.prototype.onReceive = function(other, data) {
     for (var i = 0; i < messages.length; i++) {
       var message = messages[i];
 
-      this.onMessage(other, message);
+      if (Replicator.FAKE_LAG) {
+        // fake lag
+        window.setTimeout(function() {
+          self.onMessage(other, message);
+        }, Replicator.FAKE_LAG)
+      } else {
+        self.onMessage(other, message);
+      }
     }
   }
 
