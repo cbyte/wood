@@ -17,7 +17,7 @@ const MESSAGE_NOTICE_RESPONSIBLE_VARIABLES = 5;
 // Get to know other peers and handle data connections
 var Replicator = new(function Replicator() {
   this.SERVER_IP = "127.0.0.1"
-  this.FAKE_LAG = 1000;
+  this.FAKE_LAG = 80;
 
   this.users = []; // users connected to the broker server
   this.sessions = []; // available replication sessions
