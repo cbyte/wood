@@ -1,5 +1,6 @@
 // todo: remove pos,scale,dir
 function Entity(model, atlas, defanim) {
+  this.id = Replicator.getUniqueNumber();
   this.model = model;
   this.position = [0, 0, 0];
   this.scale = [1, 1, 1];
@@ -11,7 +12,6 @@ function Entity(model, atlas, defanim) {
     this.atlas.clone(atlas);
     this.atlas.play(defanim);
   }
-  // this.coll = new AABB(scale);
 
   //for editor
   this.modeloffset = 0;

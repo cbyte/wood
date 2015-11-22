@@ -43,39 +43,63 @@ ReplicatorSession.prototype.join = function(sessionId) {
   Replicator.mySessions[idSession] = this;
 }
 
-// (server only) Register a variable within a session
+// Register a variable within a session
 ReplicatorSession.prototype.registerVariable = function(variable) {
   if (!this.host) {
-    return;
-  }
 
-  this.variables[variable.identifier] = variable;
+    this.variables[variable.identifier] = variable;
+    var setVariable = variable;
 
-  if (variable.type == REPLICATE_RELIABLE) {
-    var session = this;
+    if (setVariable.type == REPLICATE_RELIABLE) {
+      var session = this;
 
-    variable.parent.watch(variable.name, function(i, o, n) {
-      // no changes recognized
-      if (o == n) {
-        return n;
-      }
+      setVariable.parent.watch(setVariable.name, function(i, o, n) {
+        // no changes recognized
+        if (o == n) {
+          return n;
+        }
 
-      // set up reliable variable change watcher because we are the owner and send our changes to the server if we are not the server
-      if ((variable.destination == REPLICATE_CLSVCL || variable.destination == REPLICATE_SVCL) && this.owner) {
-        console.log('a reliable was changed, send a reliable message to all other peers!')
-        for (var user of session.users) {
-          console.log('to', Replicator.unreliableConnections[user])
-          session.sendReliableMessage(Replicator.unreliableConnections[user], {
+        if (setVariable.destination == REPLICATE_CLSV && setVariable.owner == Replicator.id) {
+          // send to host
+          session.sendReliableMessage(Replicator.unreliableConnections[session.owner], {
             type: MESSAGE_SET_VARIABLE_RELIABLE,
-            id: variable.identifier,
+            id: setVariable.identifier,
             val: n
           })
         }
-      }
+        return n;
+      });
+    }
+  } else {
+    this.variables[variable.identifier] = variable;
 
-      return n;
-    });
+    if (variable.type == REPLICATE_RELIABLE) {
+      var session = this;
+
+      variable.parent.watch(variable.name, function(i, o, n) {
+        // no changes recognized
+        if (o == n) {
+          return n;
+        }
+
+        // set up reliable variable change watcher because we are the owner and send our changes to the server if we are not the server
+        if ((variable.destination == REPLICATE_CLSVCL || variable.destination == REPLICATE_SVCL) && this.owner) {
+          console.log('a reliable was changed, send a reliable message to all other peers!')
+          for (var user of session.users) {
+            console.log('to', Replicator.unreliableConnections[user])
+            session.sendReliableMessage(Replicator.unreliableConnections[user], {
+              type: MESSAGE_SET_VARIABLE_RELIABLE,
+              id: variable.identifier,
+              val: n
+            })
+          }
+        }
+
+        return n;
+      });
+    }
   }
+  return this.variables[variable.identifier]
 }
 
 // send a reliable message to the other data channel
@@ -112,43 +136,6 @@ ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
     type: MESSAGE_NOTICE_RESPONSIBLE_VARIABLES,
     variables: variables
   });
-}
-
-ReplicatorSession.prototype.bindReplicationVariable = function(identifier, parentObject, variableName, deserializeReadFn, serializeWriteFn) {
-
-  var variable = this.variables[identifier]
-
-  if (!variable) {
-    variable = {};
-  }
-  variable.identifier = identifier;
-  variable.parent = parentObject;
-  variable.name = variableName;
-  variable.deserializeFn = deserializeReadFn;
-  variable.serializeFn = serializeWriteFn;
-
-  console.log('bound', variable.identifier)
-
-  if (variable.type == REPLICATE_RELIABLE) {
-    var session = this;
-
-    variable.parent.watch(variable.name, function(i, o, n) {
-      // no changes recognized
-      if (o == n) {
-        return n;
-      }
-
-      if (variable.destination == REPLICATE_CLSV && variable.owner == Replicator.id) {
-        // send to host
-        session.sendReliableMessage(Replicator.unreliableConnections[session.owner], {
-          type: MESSAGE_SET_VARIABLE_RELIABLE,
-          id: variable.identifier,
-          val: n
-        })
-      }
-      return n;
-    });
-  }
 }
 
 // at 20hz rate send the unreliable registered state snapshots
@@ -212,6 +199,7 @@ ReplicatorSession.prototype.clientTick = function() {
         console.log('Warning: Wrong bound variable')
         continue;
       }*/
+
       var varData = {
         id: variable.identifier,
         val: variable.serializeFn(variable.parent[variable.name]),
@@ -289,7 +277,7 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
         if (!this.variables[variable.identifier]) {
           this.variables[variable.identifier] = {}
         }
-
+        console.log(variable.identifier)
         this.variables[variable.identifier].identifier = variable.identifier;
         this.variables[variable.identifier].type = variable.type;
         this.variables[variable.identifier].destination = variable.destination;
@@ -321,6 +309,12 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
           if (variable.destination != REPLICATE_CLSVCL && variable.destination != REPLICATE_SVCL) {
             continue;
           }
+
+          // skip if we own the variable and we receive the servers old version of it
+          if (variable.destination == REPLICATE_CLSVCL && variable.owner == Replicator.id) {
+            continue;
+          }
+
           // console.log(data)
           if (typeof variable.deserializeFn == 'undefined') {
             // console.log(variable.identifier, 'error: no deserializeFn specified');
@@ -328,6 +322,7 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
             var value = variable.deserializeFn(data.val);
             variable.parent[variable.name] = value;
             variable.history = value;
+            variable.shouldUpdate = true;
           }
         }
       }

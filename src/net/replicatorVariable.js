@@ -8,6 +8,7 @@ function ReplicatorVariable(type, destination, owner, identifier, parentObject, 
   this.serializeFn = serializeWriteFn;
   this.deserializeFn = deserializeReadFn;
 
+  this.shouldUpdate = false;
   //this._history = [];
   //this._unconfirmed = [];
 }

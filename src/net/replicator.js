@@ -23,6 +23,7 @@ var Replicator = new(function Replicator() {
   this.sessions = []; // available replication sessions
   this.sessionsJoined = [] // indizes of sessions we have joined
   this.mySessions = {}; // self-hosted sessions that this peer owns, holds more data than the sessions array
+  this._session = null;
 
   //this.reliableConnections = {};
   this.unreliableConnections = {}; // data streams to other peers
@@ -31,6 +32,8 @@ var Replicator = new(function Replicator() {
   this.peer = null; // peer instance
   this.socket = io('http://' + this.SERVER_IP);
   var self = this;
+
+  var _uniqueNumber = 0;
 
   this.socket.on('info-connected-clients', function(users) {
     self.users = users;
@@ -121,6 +124,25 @@ var Replicator = new(function Replicator() {
 
   Replicator.prototype.disconnect = function() {
 
+  }
+
+  Replicator.prototype.setSession = function(session) {
+    this._session = session;
+  }
+
+  Replicator.prototype.getSession = function() {
+    return this._session;
+  }
+
+  // source: http://stackoverflow.com/a/105074
+  Replicator.prototype.getUniqueNumber = function() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
   }
 
   this.connectToBroker();
