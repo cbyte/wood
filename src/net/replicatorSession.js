@@ -241,6 +241,8 @@ ReplicatorSession.prototype.onMessageDataUpdated = function() {
 
 // 
 ReplicatorSession.prototype.onMessage = function(other, data) {
+  // console.log('message in')
+  // console.log(this)
   switch (data.type) {
 
     case MESSAGE_REQUEST_JOIN:

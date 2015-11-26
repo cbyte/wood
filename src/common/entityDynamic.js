@@ -1,4 +1,4 @@
-function EntityDynamic(model, collisionShape, mass) {
+function EntityDynamic(game, model, collisionShape, mass) {
   Entity.call(this, model);
 
   var transform = new Ammo.btTransform();
@@ -19,8 +19,8 @@ function EntityDynamic(model, collisionShape, mass) {
   collisionShape.calculateLocalInertia(mass, localInertia);
   this.body = new Ammo.btRigidBody(new Ammo.btRigidBodyConstructionInfo(mass, motionState, collisionShape, localInertia));
   this.body.entityReference = this;
-  Game.dynamicsWorld.addRigidBody(this.body);
-  Game.collisionObjects.push(this.body);
+  game.dynamicsWorld.addRigidBody(this.body);
+  game.collisionObjects.push(this.body);
 
   this.linVel = [0, 0, 0]
   this.angVel = [0, 0, 0]
