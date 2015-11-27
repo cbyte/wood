@@ -15,7 +15,7 @@ const MESSAGE_DATA = 4;
 const MESSAGE_NOTICE_RESPONSIBLE_VARIABLES = 5;
 
 // Get to know other peers and handle data connections
-var Replicator = new(function Replicator() {
+function Replicator() {
   this.SERVER_IP = "127.0.0.1"
   this.FAKE_LAG = 0;
 
@@ -53,9 +53,10 @@ var Replicator = new(function Replicator() {
   // send messages snapshot to the spezified peer
   Replicator.prototype.sendPacket = function(session, peerId, packet) {
 
-    // console.log(this.id, 'wants to send a package to ', peerId, 'with', messages)
+    // console.log(this.id, 'wants to send a package to ', peerId, 'with', packet)
     // compress messages
     // 
+
     packet.sessionId = session.id;
 
     //console.log(this.id, 'wants to send a package to ', peerId, 'with', packet)
@@ -98,6 +99,10 @@ var Replicator = new(function Replicator() {
   }
 
   Replicator.prototype.connectToPeer = function(peerId) {
+    if (peerId == this.id) {
+      console.log('******************* trying to connect to self!')
+    }
+
     var connection = this.peer.connect(peerId, {
       reliable: false
     });
@@ -113,37 +118,10 @@ var Replicator = new(function Replicator() {
       self.onReceivePacket(peer, data);
     });
 
-    peer.unackedReliableMessages = []; // holds a list of event messages that have been sent but still are not acknowledged
-    peer.unackedReliableMessagesFirstNumber = -1; // the number of the first reliable message that is unacked
-    peer.lastReceivedGameTime = 0;
-    peer.lastReceivedReliableAck = -1;
-    peer.lastSentReliableAck = -1;
+    peer.connectionInfo = [];
 
     this.unreliableConnections[peer.peer] = peer;
   }
 
-  Replicator.prototype.disconnect = function() {
-
-  }
-
-  Replicator.prototype.setSession = function(session) {
-    this._session = session;
-  }
-
-  Replicator.prototype.getSession = function() {
-    return this._session;
-  }
-
-  // source: http://stackoverflow.com/a/105074
-  Replicator.prototype.getUniqueNumber = function() {
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
-    }
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-      s4() + '-' + s4() + s4() + s4();
-  }
-
   this.connectToBroker();
-})()
+}

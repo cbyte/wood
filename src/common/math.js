@@ -9,3 +9,14 @@ function rand(min, max) {
   if (min == max) return min;
   return min + parseInt(Math.random() * (max - min + 1));
 }
+
+// source: http://stackoverflow.com/a/105074
+Math.getUniqueNumber = function() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}

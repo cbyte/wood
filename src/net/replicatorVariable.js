@@ -1,7 +1,8 @@
 function ReplicatorVariable(type, destination, owner, identifier, parentObject, variableName, serializeWriteFn, deserializeReadFn) {
   this.type = type;
   this.destination = destination;
-  this.owner = (destination == REPLICATE_SVCL) ? Replicator.id : owner;
+  // this.owner = (destination == REPLICATE_SVCL) ? Replicator.id : owner;
+  this.owner = owner;
   this.identifier = identifier;
   this.parent = parentObject; // target object in this game instance
   this.name = variableName;
