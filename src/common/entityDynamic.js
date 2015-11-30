@@ -25,10 +25,10 @@ function EntityDynamic(game, model, collisionShape, mass) {
   this.linVel = [0, 0, 0]
   this.angVel = [0, 0, 0]
 
-  this.positionSync = game.replicatorSession.registerVariable(new ReplicatorVariable(REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_position', this, 'position', Serializer.writeArray, Serializer.readArray));
-  this.rotationSync = game.replicatorSession.registerVariable(new ReplicatorVariable(REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_rotation', this, 'rotation', Serializer.writeFloat32Array, Serializer.readFloat32Array));
-  this.linVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_linvel', this, 'linVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
-  this.angVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_angvel', this, 'angVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
+  this.positionSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_position', this, 'position', Serializer.writeArray, Serializer.readArray));
+  this.rotationSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_rotation', this, 'rotation', Serializer.writeFloat32Array, Serializer.readFloat32Array));
+  this.linVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_linvel', this, 'linVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
+  this.angVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, this.id + '_angvel', this, 'angVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
 }
 
 EntityDynamic.prototype = Object.create(Entity.prototype);
@@ -54,7 +54,7 @@ EntityDynamic.prototype.updatePhysics = function(trans) {
 }
 
 EntityDynamic.prototype.update = function(ts) {
-  console.log(this)
+  // console.log(this)
   if (this.positionSync.shouldUpdate) {
     this.positionSync.shouldUpdate = false;
     var body = this.body;

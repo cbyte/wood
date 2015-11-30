@@ -16,7 +16,7 @@ const MESSAGE_NOTICE_RESPONSIBLE_VARIABLES = 5;
 
 // Get to know other peers and handle data connections
 function Replicator() {
-  this.SERVER_IP = "127.0.0.1"
+  this.SERVER_IP = "raspberrypi"
   this.FAKE_LAG = 0;
 
   this.users = []; // users connected to the broker server

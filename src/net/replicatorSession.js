@@ -3,6 +3,7 @@ function ReplicatorSession(replicator) {
   this.variables = {};
   this.users = [];
   this.replicator = replicator;
+  this.eventListener = {}; // holds functions which will be executed if a related event fires
 }
 
 // Create a session and register it on connection broker
@@ -248,6 +249,14 @@ ReplicatorSession.prototype.onMessageDataUpdated = function() {
 
 }
 
+// add an event listener function
+ReplicatorSession.prototype.on = function(eventName, listenerFn) {
+  if (!this.eventListener[eventName]) {
+    this.eventListener[eventName] = []
+  }
+  this.eventListener[eventName].push(listenerFn);
+}
+
 // 
 ReplicatorSession.prototype.onMessage = function(other, data) {
   // console.log('message', data, ', from', other.peer)
@@ -349,6 +358,14 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
     default:
       console.log('Could not handle', data.type);
       break;
+  }
+
+  // call listening functions
+  var eventListener = this.eventListener[data.type];
+  if (eventListener) {
+    for (var i = 0; i < eventListener.length; i++) {
+      eventListener[i](data);
+    }
   }
 }
 
