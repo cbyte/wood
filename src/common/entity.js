@@ -1,6 +1,7 @@
 // todo: remove pos,scale,dir
-function Entity(model, atlas, defanim) {
-  this.id = Math.getUniqueNumber();
+function Entity(game, model, atlas, defanim) {
+  this.game = game; // hold reference to game instance
+  // this.id = Math.getUniqueNumber();
   this.model = model;
   this.position = [0, 0, 0];
   this.scale = [1, 1, 1];

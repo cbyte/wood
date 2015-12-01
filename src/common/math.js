@@ -20,3 +20,16 @@ Math.getUniqueNumber = function() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
     s4() + '-' + s4() + s4() + s4();
 }
+
+// returns index if found else -1
+Array.prototype.exists = function(param, value) {
+  var found = -1;
+  this.forEach(function(e, i) {
+    if (typeof e[param] != 'undefined') {
+      if (e[param] == value) {
+        found = i;
+      }
+    }
+  })
+  return found;
+}

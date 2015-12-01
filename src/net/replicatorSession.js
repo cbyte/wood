@@ -204,11 +204,13 @@ ReplicatorSession.prototype.clientTick = function() {
     var variable = this.variables[variableIndex];
 
     if ((variable.destination == REPLICATE_CLSV || variable.destination == REPLICATE_CLSVCL) && variable.type == REPLICATE_UNRELIABLE) {
+      
       /*if (typeof variable.name === 'undefined' || typeof variable.parent[variable.name] === 'undefined') {
         console.log('Warning: Wrong bound variable')
         continue;
       }*/
 
+      // console.log("at",(this.host?"host":"client"),'pushing',variable.identifier,"which is",variable.parent[variable.name])
       var varData = {
         id: variable.identifier,
         val: variable.serializeFn(variable.parent[variable.name]),
@@ -344,6 +346,7 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
           if (typeof variable.deserializeFn == 'undefined') {
             // console.log(variable.identifier, 'error: no deserializeFn specified');
           } else {
+            // console.log('set variable',variable.identifier)
             var value = variable.deserializeFn(data.val);
             variable.parent[variable.name] = value;
             variable.history = value;

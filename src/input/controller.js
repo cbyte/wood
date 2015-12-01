@@ -14,6 +14,10 @@ var Input = new function() {
   this.p = 0;
   this.r = 0;
   this.c = 0;
+  this.alt_up = 0;
+  this.alt_dn = 0;
+  this.alt_lt = 0;
+  this.alt_rt = 0;
 
   this.orientationX = 0;
   this.orientationY = 0;
@@ -113,6 +117,10 @@ var Input = new function() {
       if (e.which == 80) Input.p = 1;
       if (e.which == 82) Input.r = 1;
       if (e.which == 67) Input.c = 1;
+      if (e.which == 37) Input.alt_lt = 1;
+      if (e.which == 38) Input.alt_up = 1;
+      if (e.which == 39) Input.alt_rt = 1;
+      if (e.which == 40) Input.alt_dn = 1;
     } else if (e.type == "keyup") {
       if (e.which == 32) Input.space = 0;
       if (e.which == 65) Input.lt = 0;
@@ -129,6 +137,10 @@ var Input = new function() {
       if (e.which == 80) Input.p = 0;
       if (e.which == 82) Input.r = 0;
       if (e.which == 67) Input.c = 0;
+      if (e.which == 37) Input.alt_lt = 0;
+      if (e.which == 38) Input.alt_up = 0;
+      if (e.which == 39) Input.alt_rt = 0;
+      if (e.which == 40) Input.alt_dn = 0;
     }
   }
 

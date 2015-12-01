@@ -8,7 +8,7 @@ var Serializer = new(function Serializer() {
   }
 
   Serializer.prototype.writeArray = function(array) {
-    return array;
+    return Array.prototype.slice.call(array);
   }
 
   Serializer.prototype.readArray = function(stream) {
