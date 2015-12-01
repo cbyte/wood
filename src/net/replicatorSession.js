@@ -107,16 +107,25 @@ ReplicatorSession.prototype.registerVariable = function(variable) {
   return this.variables[variable.identifier]
 }
 
+ReplicatorSession.prototype.broadcast = function(message) {
+  if(this.host) {
+    for(var i=0; i<this.users.length;i++) {
+      var user = this.users[i];
+      this.sendReliableMessage(this.replicator.unreliableConnections[user], message);
+    }
+  }
+}
+
 // send a reliable message to the other data channel
 ReplicatorSession.prototype.sendReliableMessage = function(other, message) {
   if (!this.host) {
     other = this.replicator.unreliableConnections[this.owner];
   }
 
-  console.log(other)
-
+  // console.log(other)
+  if(other) {
   other.connectionInfo[this.id].unackedReliableMessages.push(message);
-
+  }
 }
 
 // send for each peer-authorized variable its information to that peer
