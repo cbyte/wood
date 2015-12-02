@@ -4,6 +4,7 @@ function ReplicatorSession(replicator) {
   this.users = [];
   this.replicator = replicator;
   this.eventListener = {}; // holds functions which will be executed if a related event fires
+  this.shouldUpdate = false;
 }
 
 // Create a session and register it on connection broker
@@ -340,6 +341,7 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
     case MESSAGE_DATA:
       var allData = data.data;
       // console.log('received from', other.peer, 'the data', allData)
+      this.shouldUpdate = true;
 
       for (var i = 0; i < allData.length; i++) {
         var data = allData[i];
