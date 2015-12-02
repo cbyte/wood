@@ -1,5 +1,7 @@
-function EntityDynamic(game, id, model, collisionShape, mass) {
+function EntityDynamic(game, id, owner, model, collisionShape, mass) {
   Entity.call(this, game, model);
+
+  this.owner = owner;
 
   var transform = new Ammo.btTransform();
   transform.setIdentity();
@@ -25,18 +27,19 @@ function EntityDynamic(game, id, model, collisionShape, mass) {
   this.linVel = [0, 0, 0]
   this.angVel = [0, 0, 0]
 
-  this.positionSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, id + '_position', this, 'position', Serializer.writeArray, Serializer.readArray));
-  this.rotationSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, id + '_rotation', this, 'rotation', Serializer.writeFloat32Array, Serializer.readFloat32Array));
-  this.linVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, id + '_linvel', this, 'linVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
-  this.angVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, game.replicator.id, id + '_angvel', this, 'angVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
+  this.positionSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_position', this, 'position', Serializer.writeArray, Serializer.readArray));
+  this.rotationSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_rotation', this, 'rotation', Serializer.writeFloat32Array, Serializer.readFloat32Array));
+  this.linVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_linvel', this, 'linVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
+  this.angVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_angvel', this, 'angVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
 }
 
 EntityDynamic.prototype = Object.create(Entity.prototype);
 EntityDynamic.prototype.constructor = EntityDynamic;
 
+
+// get information from physic simulation (which had been stepped before)
 EntityDynamic.prototype.updatePhysics = function(trans) {
   // stay in sync with physics step calculation
-  // console.log('set to server position')
   var obj = this.body;
 
   var motionState = obj.getMotionState();
@@ -54,9 +57,9 @@ EntityDynamic.prototype.updatePhysics = function(trans) {
 }
 
 EntityDynamic.prototype.update = function(ts) {
-  // console.log(this)
-  if (this.positionSync.shouldUpdate) {
-    console.log('updating because there is sth new in positionSync')
+  // console.log('update', this)
+  if (this.positionSync.shouldUpdate && !this.game.replicatorSession.host) {
+    // console.log('updating because there is sth new in positionSync', this.positionSync.history)
     this.positionSync.shouldUpdate = false;
     var body = this.body;
     var motionState = body.getMotionState();
@@ -77,7 +80,7 @@ EntityDynamic.prototype.update = function(ts) {
     // step forward to be right in time: do not stay in the old server time but recalculate to the clients present time
     // todo: fix that we render just at this moment, this would lead to laggy movement
     // maybe it would be good to pause when we update the data, better it would be maybe to not write in the drawable arrays but temporary ones (above after calculation)
-    // Game.stepCollision(1 / 30, 2);
+    // this.game.stepCollision(1 / 30, 2);
   }
 }
 

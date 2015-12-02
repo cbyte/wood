@@ -10,6 +10,7 @@ function ReplicatorSession(replicator) {
 ReplicatorSession.prototype.create = function(password) {
   this.password = password
   this.host = true;
+  this.owner = this.replicator.id;
   this._sequenceNumber = 0;
   var self = this;
   this.replicator.socket.emit('create-session', this.replicator.id, this.password, function(id) {
@@ -138,8 +139,9 @@ ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
   for (var variableIndex in this.variables) {
     var variable = this.variables[variableIndex];
     // send owner's variables and variables shared by everyone (server's variables)
-    if (variable.owner == peerId || variable.owner == this.replicator.id) {
+    if (variable.owner == peerId || variable.owner == this.replicator.id) { // if is useless here?
       variables.push({
+        owner: (variable.owner == peerId?peerId:false),
         identifier: variable.identifier,
         type: variable.type,
         destination: variable.destination,
@@ -157,7 +159,7 @@ ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
 ReplicatorSession.prototype.serverTick = function() {
   // send an unreliable snapshot of the variables
   // console.log('srv tick')
-  // set sequence number
+  // set sequence number -> TODO: this should be placed in replicator (lower level)
   this._sequenceNumber++;
 
   // gather variables
@@ -306,7 +308,7 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
 
     case MESSAGE_NOTICE_RESPONSIBLE_VARIABLES:
       console.log('received MESSAGE_NOTICE_RESPONSIBLE_VARIABLES', data.variables);
-
+      // add received replicated variables to our session
       for (var i = 0; i < data.variables.length; i++) {
         var variable = data.variables[i];
 
@@ -317,6 +319,9 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
         this.variables[variable.identifier].identifier = variable.identifier;
         this.variables[variable.identifier].type = variable.type;
         this.variables[variable.identifier].destination = variable.destination;
+        if(variable.owner) {
+          this.variables[variable.identifier].owner = variable.owner;
+        }
       }
 
       this.onResponsibleVariablesNotice();
