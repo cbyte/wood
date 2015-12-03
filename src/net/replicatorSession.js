@@ -50,6 +50,12 @@ ReplicatorSession.prototype.join = function(sessionId) {
   this.replicator.mySessions[idSession] = this;
 }
 
+ReplicatorSession.prototype.setHistoryStep = function(index) {
+  for(var i = 0; i< this.variables.length; i++) {
+    this.variables[i].setHistoryStep(index);
+  }
+}
+
 // Register a variable within a session
 ReplicatorSession.prototype.registerVariable = function(variable) {
   if (!this.host) {
