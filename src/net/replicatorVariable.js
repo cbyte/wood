@@ -1,4 +1,4 @@
-function ReplicatorVariable(replicator, type, destination, owner, identifier, parentObject, variableName, serializeWriteFn, deserializeReadFn) {
+function ReplicatorVariable(replicator, type, destination, owner, identifier, parentObject, variableName, serializeWriteFn, deserializeReadFn, interpolateFn) {
   this.type = type;
   this.destination = destination;
   // this.owner = (destination == REPLICATE_SVCL) ? replicator.id : owner;
@@ -8,6 +8,7 @@ function ReplicatorVariable(replicator, type, destination, owner, identifier, pa
   this.name = variableName;
   this.serializeFn = serializeWriteFn;
   this.deserializeFn = deserializeReadFn;
+  this.interpolateFn = interpolateFn;
 
   this.shouldUpdate = false;
   //this._history = [];

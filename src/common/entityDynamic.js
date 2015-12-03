@@ -27,7 +27,7 @@ function EntityDynamic(game, id, owner, model, collisionShape, mass) {
   this.linVel = [0, 0, 0]
   this.angVel = [0, 0, 0]
 
-  this.positionSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_position', this, 'position', Serializer.writeArray, Serializer.readArray));
+  this.positionSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_position', this, 'position', Serializer.writeArray, Serializer.readArray, Serializer.interpolateArray));
   this.rotationSync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_rotation', this, 'rotation', Serializer.writeFloat32Array, Serializer.readFloat32Array));
   this.linVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_linvel', this, 'linVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
   this.angVelocitySync = game.replicatorSession.registerVariable(new ReplicatorVariable(game.replicator, REPLICATE_UNRELIABLE, REPLICATE_SVCL, this.game.replicatorSession.owner, id + '_angvel', this, 'angVel', Serializer.writeFloat32Array, Serializer.readFloat32Array));
@@ -38,7 +38,7 @@ EntityDynamic.prototype.constructor = EntityDynamic;
 
 
 // get information from physic simulation (which had been stepped before)
-EntityDynamic.prototype.updatePhysics = function(trans) {
+EntityDynamic.prototype.setPositionRotationVelocityFromPhysicSimulation = function(trans) {
   // stay in sync with physics step calculation
   var obj = this.body;
 
@@ -50,39 +50,32 @@ EntityDynamic.prototype.updatePhysics = function(trans) {
   var linVel = obj.getLinearVelocity();
   var angVel = obj.getAngularVelocity();
 
-  obj.entityReference.position = [origin.x(), origin.y(), origin.z()]
-  obj.entityReference.rotation = quat.fromValues(rotat.x(), rotat.y(), rotat.z(), rotat.w());
-  obj.entityReference.linVel = [linVel.x(), linVel.y(), linVel.z()];
-  obj.entityReference.angVel = [angVel.x(), angVel.y(), angVel.z()];
+  this.position = [origin.x(), origin.y(), origin.z()]
+  this.rotation = quat.fromValues(rotat.x(), rotat.y(), rotat.z(), rotat.w());
+  this.linVel = [linVel.x(), linVel.y(), linVel.z()];
+  this.angVel = [angVel.x(), angVel.y(), angVel.z()];
 }
 
-EntityDynamic.prototype.update = function(ts) {
-  // console.log('update', this)
-  if (this.positionSync.shouldUpdate && !this.game.replicatorSession.host) {
-    // console.log('updating because there is sth new in positionSync', this.positionSync.history)
-    this.positionSync.shouldUpdate = false;
-    var body = this.body;
-    var motionState = body.getMotionState();
 
-    var position = this.positionSync;
-    var rotation = this.rotationSync;
-    var linVel = this.linVelocitySync;
-    var angVel = this.angVelocitySync;
-    var transform = new Ammo.btTransform();
-    transform.setOrigin(new Ammo.btVector3(position.history[0], position.history[1], position.history[2]));
-    transform.setRotation(new Ammo.btQuaternion(rotation.history[0], rotation.history[1], rotation.history[2], rotation.history[3]))
+EntityDynamic.prototype.setPhysicsTransformFromPositionRotationVelocity = function() {
+  var body = this.body;
+  var motionState = body.getMotionState();
 
-    body.setLinearVelocity(new Ammo.btVector3(linVel.history[0], linVel.history[1], linVel.history[2]));
-    body.setAngularVelocity(new Ammo.btVector3(angVel.history[0], angVel.history[1], angVel.history[2]));
-    body.setWorldTransform(transform)
-    motionState.setWorldTransform(transform)
+  var position = this.positionSync;
+  var rotation = this.rotationSync;
+  var linVel = this.linVelocitySync;
+  var angVel = this.angVelocitySync;
+  var transform = new Ammo.btTransform();
+  transform.setOrigin(new Ammo.btVector3(this.position[0], this.position[1], this.position[2]));
+  transform.setRotation(new Ammo.btQuaternion(this.rotation[0], this.rotation[1], this.rotation[2], this.rotation[3]))
 
-    // step forward to be right in time: do not stay in the old server time but recalculate to the clients present time
-    // todo: fix that we render just at this moment, this would lead to laggy movement
-    // maybe it would be good to pause when we update the data, better it would be maybe to not write in the drawable arrays but temporary ones (above after calculation)
-    // this.game.stepCollision(1 / 30, 2);
-  }
+  body.setLinearVelocity(new Ammo.btVector3(this.linVel[0], this.linVel[1], this.linVel[2]));
+  body.setAngularVelocity(new Ammo.btVector3(this.angVel[0], this.angVel[1], this.angVel[2]));
+  body.setWorldTransform(transform)
+  motionState.setWorldTransform(transform);
 }
+
+EntityDynamic.prototype.update = function(ts) {}
 
 // Update the position and rotation after it has been changed manually
 EntityDynamic.prototype.updateCollision = function() {

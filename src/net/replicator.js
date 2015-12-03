@@ -18,6 +18,7 @@ const MESSAGE_NOTICE_RESPONSIBLE_VARIABLES = 5;
 function Replicator() {
   this.SERVER_IP = "localhost"
   this.FAKE_LAG = 0;
+  this.INTERP = 0.75;
 
   this.users = []; // users connected to the broker server
   this.sessions = []; // available replication sessions
@@ -61,7 +62,15 @@ function Replicator() {
 
     //console.log(this.id, 'wants to send a package to ', peerId, 'with', packet)
 
-    this.unreliableConnections[peerId].send(packet);
+    var self = this;
+    if (this.FAKE_LAG) {
+      // fake lag
+      window.setTimeout(function() {
+        self.unreliableConnections[peerId].send(packet);
+      }, this.FAKE_LAG);
+    } else {
+      self.unreliableConnections[peerId].send(packet);
+    }
   }
 
   Replicator.prototype.onReceivePacket = function(other, data) {
@@ -72,7 +81,14 @@ function Replicator() {
     // todo: delete duplicated packets
     // todo: ignore older packets?
 
-    session.onReceive(other, data)
+    if (this.FAKE_LAG) {
+      // fake lag
+      window.setTimeout(function() {
+        session.onReceive(other, data);
+      }, this.FAKE_LAG);
+    } else {
+      session.onReceive(other, data);
+    }
   }
 
   // connect to connection broker and handle new peer connections

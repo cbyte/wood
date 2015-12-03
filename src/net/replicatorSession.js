@@ -110,8 +110,8 @@ ReplicatorSession.prototype.registerVariable = function(variable) {
 }
 
 ReplicatorSession.prototype.broadcast = function(message) {
-  if(this.host) {
-    for(var i=0; i<this.users.length;i++) {
+  if (this.host) {
+    for (var i = 0; i < this.users.length; i++) {
       var user = this.users[i];
       this.sendReliableMessage(this.replicator.unreliableConnections[user], message);
     }
@@ -125,8 +125,8 @@ ReplicatorSession.prototype.sendReliableMessage = function(other, message) {
   }
 
   // console.log(other)
-  if(other) {
-  other.connectionInfo[this.id].unackedReliableMessages.push(message);
+  if (other) {
+    other.connectionInfo[this.id].unackedReliableMessages.push(message);
   }
 }
 
@@ -142,7 +142,7 @@ ReplicatorSession.prototype.sendResponsibleVariables = function(peerId) {
     // send owner's variables and variables shared by everyone (server's variables)
     if (variable.owner == peerId || variable.owner == this.replicator.id) { // if is useless here?
       variables.push({
-        owner: (variable.owner == peerId?peerId:false),
+        owner: (variable.owner == peerId ? peerId : false),
         identifier: variable.identifier,
         type: variable.type,
         destination: variable.destination,
@@ -216,7 +216,7 @@ ReplicatorSession.prototype.clientTick = function() {
     var variable = this.variables[variableIndex];
 
     if ((variable.destination == REPLICATE_CLSV || variable.destination == REPLICATE_CLSVCL) && variable.type == REPLICATE_UNRELIABLE) {
-      
+
       /*if (typeof variable.name === 'undefined' || typeof variable.parent[variable.name] === 'undefined') {
         console.log('Warning: Wrong bound variable')
         continue;
@@ -320,7 +320,7 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
         this.variables[variable.identifier].identifier = variable.identifier;
         this.variables[variable.identifier].type = variable.type;
         this.variables[variable.identifier].destination = variable.destination;
-        if(variable.owner) {
+        if (variable.owner) {
           this.variables[variable.identifier].owner = variable.owner;
         }
       }
@@ -362,10 +362,16 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
           if (typeof variable.deserializeFn == 'undefined') {
             // console.log(variable.identifier, 'error: no deserializeFn specified');
           } else {
-            // console.log('set variable',variable.identifier)
-            var value = variable.deserializeFn(data.val);
-            variable.parent[variable.name] = value;
-            variable.history = value;
+            var newValue = variable.deserializeFn(data.val);
+            var oldValue = variable.parent[variable.name];
+            // console.log('set variable', variable.identifier, oldValue, newValue)
+
+            if (variable.interpolateFn) {
+              variable.parent[variable.name] = variable.interpolateFn(this.replicator.INTERP, oldValue, newValue);
+            } else {
+              variable.parent[variable.name] = newValue;
+            }
+            // variable.history = newValue;
             variable.shouldUpdate = true;
           }
         }
@@ -420,15 +426,7 @@ ReplicatorSession.prototype.onReceive = function(other, data) {
     // console.log('**unreliable**')
     for (var i = 0; i < messages.length; i++) {
       var message = messages[i];
-
-      if (this.replicator.FAKE_LAG) {
-        // fake lag
-        window.setTimeout(function() {
-          self.onMessage(other, message);
-        }, this.replicator.FAKE_LAG)
-      } else {
-        self.onMessage(other, message);
-      }
+      self.onMessage(other, message);
     }
   }
 
