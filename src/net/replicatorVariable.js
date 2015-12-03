@@ -11,6 +11,10 @@ function ReplicatorVariable(replicator, type, destination, owner, identifier, pa
   this.interpolateFn = interpolateFn;
 
   this.shouldUpdate = false;
-  //this._history = [];
-  //this._unconfirmed = [];
+  this.history = []; // holds past unacked values, if we own this variable.
+                     // on server, it holds inputs which not yet are used for steps
+}
+
+ReplicatorVariable.prototype.setHistoryStep = function(index) {
+
 }
