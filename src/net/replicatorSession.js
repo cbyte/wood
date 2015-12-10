@@ -51,7 +51,7 @@ ReplicatorSession.prototype.join = function(sessionId) {
 }
 
 ReplicatorSession.prototype.setHistoryStep = function(index) {
-  for(var i = 0; i< this.variables.length; i++) {
+  for (var i = 0; i < this.variables.length; i++) {
     this.variables[i].setHistoryStep(index);
   }
 }
@@ -216,6 +216,7 @@ ReplicatorSession.prototype.serverTick = function() {
 
 // at 60hz send unreliable client input
 ReplicatorSession.prototype.clientTick = function() {
+  this._sequenceNumber++;
   // gather variables
   var variables = [];
   for (var variableIndex in this.variables) {
@@ -243,7 +244,7 @@ ReplicatorSession.prototype.clientTick = function() {
   var other = this.replicator.unreliableConnections[this.owner];
   this.replicator.sendPacket(this, this.owner, {
     ts: new Date().getTime(),
-    //sequence: this.count
+    nr: this._sequenceNumber,
     messages: [{
       type: MESSAGE_DATA,
       data: variables,
@@ -278,7 +279,7 @@ ReplicatorSession.prototype.on = function(eventName, listenerFn) {
 }
 
 // 
-ReplicatorSession.prototype.onMessage = function(other, data) {
+ReplicatorSession.prototype.onMessage = function(other, data, timestamp, sequenceNumber) {
   // console.log('message', data, ', from', other.peer)
   // console.log(this)
   switch (data.type) {
@@ -377,7 +378,49 @@ ReplicatorSession.prototype.onMessage = function(other, data) {
             } else {
               variable.parent[variable.name] = newValue;
             }
-            // variable.history = newValue;
+
+            // store in history array
+            variable.history.push({
+              nr: sequenceNumber,
+              ts: timestamp,
+              val: newValue
+            });
+
+            // remove old history entries
+            if (this.host) {
+              // if server is variable owner then use the latest known input before the step time that is calculated
+              // and delete the older entries after the step has been executed
+
+
+              // TODO: What happens when the array gets smaller during the for loop (because it is accessing via indizes)?
+              // for (var i = 0; i < variable.history.length; i++) {
+              //   var historyEntry = variable.history[i];
+
+              //   if (historyEntry.ts <= CURRENT_TIMESTEP && i - 1 > -1) {
+              //     variable.history.splice(i, 1); // remove outdated entry if there is another one still left
+              //   }
+              // }
+            } else {
+              if (variable.owner == this.replicator.id) {
+                // if client is variable owner then use the history for local prediction (delete acked sequence numbers)
+                for (var i = 0; i < variable.history.length; i++) {
+                  var historyEntry = variable.history[i];
+
+                  // TODO: Fill the lastSequenceOppositeReceived variable...
+                  // we send our sequence number each tick but the opponent has to
+                  // send the received number on his part to us, too, which isn't implemented yet
+                  if (historyEntry.nr <= this.lastSequenceOppositeReceived && i - 1 > -1) {
+                    variable.history.splice(i, 1); // remove outdated entry if there is another one still left
+                  }
+                }
+              } else {
+                // if client is variable receiver use the latest known value x-times to predict the input steps of the stranger
+                // delete all entries except the newest
+                variable.history = variable.history.slice(a.length - 1)
+              }
+
+            }
+
             variable.shouldUpdate = true;
           }
         }
@@ -432,7 +475,7 @@ ReplicatorSession.prototype.onReceive = function(other, data) {
     // console.log('**unreliable**')
     for (var i = 0; i < messages.length; i++) {
       var message = messages[i];
-      self.onMessage(other, message);
+      self.onMessage(other, message, data.ts, data.nr);
     }
   }
 
@@ -456,7 +499,7 @@ ReplicatorSession.prototype.onReceive = function(other, data) {
     for (var i = 0; i < reliable.length; i++) {
       var rMessage = reliable[i];
 
-      this.onMessage(other, rMessage);
+      this.onMessage(other, rMessage, data.ts, data.nr);
     }
   }
 
