@@ -1,4 +1,6 @@
 var Input = new function() {
+  this.keyBindings = [] // only supports one method per keyCode
+
   this.up = 0;
   this.dn = 0;
   this.lt = 0;
@@ -101,7 +103,12 @@ var Input = new function() {
   }
 
   this.keyevent = function(e) {
+    //console.log(e.which)
     if (e.type == "keydown") {
+      if (Input.keyBindings[e.which]) {
+        Input.keyBindings[e.which]();
+      }
+
       if (e.which == 32) Input.space = 1; //space
       if (e.which == 65) Input.lt = 1; //a
       if (e.which == 83) Input.dn = 1; //s
@@ -145,14 +152,22 @@ var Input = new function() {
   }
 
   this.mouseEvent = function(e) {
-    if(e.type == 'mousedown') {
-      if(e.button == 0) Input.mouse0 = 1;
-      if(e.button == 1) Input.mouse1 = 1;
-      if(e.button == 2) Input.mouse2 = 1;
+    if (e.type == 'mousedown') {
+      if (e.button == 0) Input.mouse0 = 1;
+      if (e.button == 1) Input.mouse1 = 1;
+      if (e.button == 2) Input.mouse2 = 1;
     } else if (e.type == 'mouseup') {
-      if(e.button == 0) Input.mouse0 = 0;
-      if(e.button == 1) Input.mouse1 = 0;
-      if(e.button == 2) Input.mouse2 = 0;
+      if (e.button == 0) Input.mouse0 = 0;
+      if (e.button == 1) Input.mouse1 = 0;
+      if (e.button == 2) Input.mouse2 = 0;
     }
+  }
+
+  this.bindKey = function(charCode, fn) {
+    this.keyBindings[charCode] = fn;
+  }
+
+  this.unbindKey = function(charCode) {
+    delete this.keyBindings[charCode];
   }
 };
